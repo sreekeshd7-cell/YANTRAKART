@@ -33,7 +33,7 @@ Welcome to YANTRAKART – Your one-stop IoT store and management platform! This 
 ## 🚀 Getting Started
 
 1. **Clone the Repository**
-git clone https://github.com/Harshvats4140/YANTRAKART.git
+git clone https://github.com/sreekeshd7-cell/YANTRAKART
 cd YANTRAKART
 
 
@@ -67,15 +67,6 @@ Open http://localhost:3000 in your browser.
   firebase deploy
   ```
 
-5. **Vercel Deployment**
-- Install Vercel CLI:
-  ```
-  npm install -g vercel
-  ```
-- Deploy:
-  ```
-  vercel
-  ```
 
 ## 🗂️ Project Structure
 
@@ -98,7 +89,6 @@ text
 |-----------------|------------------------------|
 | npm start       | Start the server              |
 | firebase deploy | Deploy to Firebase Hosting    |
-| vercel          | Deploy to Vercel             |
 
 ## 🔐 Environment Variables
 
@@ -135,4 +125,4 @@ If you like this project, please ⭐️ the repo and share it!
 
 ---
 
-Visit yantrakart.vercel.app or https://yantrakartcu.web.app to explore the live project
+Visit https://yantrakartcu.web.app to explore the live project
