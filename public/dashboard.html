@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>User Dashboard | Yantrakart</title>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <style>
+    body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: #0d1117;
+  color: #c9d1d9;
+  display: flex;
+  min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
+}
+#error-banner {
+  display: none;
+  position: fixed;
+  width: 100vw;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  background: #ff3864;
+  color: #fff;
+  font-weight: bold;
+  padding: 16px 0;
+  text-align: center;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 12px #ff3864b0;
+}
+.header-bar {
+  position: fixed;
+  right: 0;
+  left: 250px;
+  top: 0;
+  height: 60px;
+  background: transparent;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 32px;
+  gap: 12px;
+}
+.header-bar .header-btn {
+  background: linear-gradient(90deg, #00ffe7 0%, #00c2ab 100%);
+  color: #0d1117;
+  border: none;
+  border-radius: 10px;
+  padding: 9px 20px;
+  font-size: 1.08rem;
+  cursor: pointer;
+  font-weight: 600;
+  margin-left: 8px;
+  box-shadow: 0 0 12px #00ffe7;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.header-bar .header-btn:hover {
+  background: linear-gradient(90deg, #00c2ab 0%, #00ffe7 100%);
+  color: #0d1117;
+  box-shadow: 0 0 22px #00ffe7;
+}
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  background: #161b22;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+}
+
+.sidebar-menu {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* CRITICAL for flexbox scrolling! */
+}
+
+.sidebar-user {
+  /* Optional: fixed user area at top */
+  flex: 0 0 auto;
+}
+
+.sidebar-nav {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 0;
+  overflow-y: auto;
+  min-height: 0; /* CRITICAL for flexbox scrolling! */
+  max-height: 100vh;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sidebar .logo-link {
+  display: block;
+  text-align: center;
+  margin: 34px 0 16px 0;
+}
+.sidebar .logo-img {
+  height: 54px;
+  border-radius: 14px;
+  border: none;
+  background: #fff;
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+.sidebar .logo-title {
+  font-size: 1.45rem;
+  color: #00ffe7;
+  font-weight: 700;
+  margin-top: 7px;
+  letter-spacing: 1.2px;
+  text-shadow: 0 0 15px #00ffe7, 0 0 6px #00ffe7;
+  filter: drop-shadow(0 0 6px #00ffe7);
+}
+.sidebar-user {
+  text-align: center;
+  margin-bottom: 18px;
+}
+#sidebar-username {
+  color: #00ffe7;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+.sidebar a {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #c9d1d9;
+  padding: 14px 36px;
+  margin: 0 0 6px 0;
+  border-radius: 10px 0 0 10px;
+  background: none;
+  border: none;
+  font-size: 1.13rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  position: relative;
+  text-align: left;
+  font-weight: 500;
+}
+.sidebar a.active, .sidebar a:hover {
+  background: linear-gradient(90deg, #00ffe7 0%, #00c2ab 100%);
+  color: #0d1117;
+  box-shadow: 0 0 18px #00ffe7;
+}
+.badge {
+  background: #ff3864;
+  color: #fff;
+  border-radius: 50%;
+  padding: 3px 8px;
+  font-size: 0.95rem;
+  font-weight: bold;
+  margin-left: 10px;
+  display: inline-block;
+  min-width: 24px;
+  text-align: center;
+  box-shadow: 0 0 8px #ff3864;
+}
+.main-content {
+  margin-left: 250px;
+  padding: 80px 24px 24px 24px;
+  width: 100%;
+  min-height: 100vh;
+  background: #0d1117;
+  transition: background 0.3s, color 0.3s;
+}
+.loading {
+  text-align: center;
+  font-size: 1.18rem;
+  color: #00ffe7;
+  margin-top: 30px;
+  letter-spacing: 1px;
+  animation: pulse 1.2s infinite;
+}
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+.profile-card {
+  background: #161b22;
+  padding: 28px;
+  border-radius: 18px;
+  box-shadow: 0 0 22px #00ffe7a0;
+  max-width: 420px;
+  margin: 28px auto 24px auto;
+  text-align: center;
+  border: 2px solid #00ffe7;
+}
+.profile-card .name {
+  font-size: 1.3rem;
+  color: #00ffe7;
+  margin-bottom: 10px;
+  font-weight: 600;
+  text-shadow: 0 0 10px #00ffe7;
+}
+.profile-card .email, .profile-card .phone, .profile-card .created, .profile-card .lastlogin {
+  font-size: 1.05rem;
+  color: #c9d1d9;
+  margin-bottom: 3px;
+  font-weight: 500;
+}
+.profile-card button, .profile-card .share-btn {
+  background: linear-gradient(90deg, #00ffe7 0%, #00c2ab 100%);
+  color: #0d1117;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 14px;
+  margin-bottom: 8px;
+  box-shadow: 0 0 12px #00ffe7;
+  font-size: 1.08rem;
+  transition: background 0.3s, box-shadow 0.3s;
+  display: inline-block;
+}
+.profile-card button:hover, .profile-card .share-btn:hover {
+  background: linear-gradient(90deg, #00c2ab 0%, #00ffe7 100%);
+  box-shadow: 0 0 22px #00ffe7;
+}
+.section-title {
+  color: #00ffe7;
+  font-size: 1.5rem;
+  margin-bottom: 22px;
+  text-shadow: 0 0 18px #00ffe7;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 32px;
+  box-shadow: 0 0 18px #00ffe7a0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+table th, table td {
+  padding: 15px;
+  border: 1.5px solid #00ffe7;
+  text-align: left;
+  font-size: 1.08rem;
+}
+table th {
+  background: #00ffe7;
+  color: #0d1117;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 8px #00ffe7;
+}
+table td {
+  background: #161b22;
+  color: #c9d1d9;
+  font-weight: 500;
+}
+@media (max-width: 600px) {
+  table, thead, tbody, th, td, tr {
+    display: block;
+    width: 100%;
+  }
+  table {
+    overflow-x: auto;
+    display: block;
+    border-radius: 10px;
+  }
+  thead {
+    display: none;
+  }
+  tr {
+    margin-bottom: 18px;
+    border-bottom: 1px solid #00ffe7;
+    background: #161b22;
+    border-radius: 8px;
+    box-shadow: 0 0 6px #00ffe74a;
+    padding: 10px 0;
+  }
+  td {
+    text-align: left;
+    padding: 10px 8px 10px 46%;
+    position: relative;
+    border: none;
+    min-height: 32px;
+    font-size: 1.02rem;
+  }
+  /* Orders table labels */
+  #main-content tr td:nth-child(1)::before { content: "Order Date"; position: absolute; left: 10px; font-weight: bold; color: #00ffe7; }
+  #main-content tr td:nth-child(2)::before { content: "Referral Code Used"; position: absolute; left: 10px; font-weight: bold; color: #00ffe7; }
+  #main-content tr td:nth-child(3)::before { content: "Coupon Used"; position: absolute; left: 10px; font-weight: bold; color: #00ffe7; }
+  #main-content tr td:nth-child(4)::before { content: "Discount"; position: absolute; left: 10px; font-weight: bold; color: #00ffe7; }
+  #main-content tr td:nth-child(5)::before { content: "Final Amount"; position: absolute; left: 10px; font-weight: bold; color: #00ffe7; }
+  /* Coupons table labels */
+  #main-content tr td:nth-child(1)[colspan]::before { content: ""; }
+  #main-content tr td:nth-child(1):not([colspan])::before { content: "Coupon Code"; position: absolute; left: 10px; font-weight: bold; color: #00ffe7; }
+  #main-content tr td:nth-child(2):not([colspan])::before { content: "Discount"; position: absolute; left: 10px; font-weight: bold; color: #00ffe7; }
+  #main-content tr td:nth-child(3):not([colspan])::before { content: "Status"; position: absolute; left: 10px; font-weight: bold; color: #00ffe7; }
+}
+.custom-message {
+  color: #ff3864;
+  font-size: 1.1rem;
+  background: #161b22;
+  padding: 24px;
+  border-radius: 12px;
+  text-align: center;
+  margin-top: 34px;
+  box-shadow: 0 0 14px #00ffe7a0;
+  border: 1.5px solid #ff3864;
+}
+.status-badge {
+  padding: 6px 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1.03rem;
+  letter-spacing: 0.5px;
+  box-shadow: 0 0 8px #00ffe780;
+  border: 1.5px solid #00ffe7;
+  display: inline-block;
+}
+.status-pending { background: #ffb300; color: #0d1117; }
+.status-inprogress { background: #42a5f5; color: #fff; }
+.status-delivered { background: #43e97b; color: #0d1117; }
+.status-cancelled { background: #ff3864; color: #fff; }
+.change-password-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: stretch;
+  max-width: 370px;
+  margin: 0 auto;
+}
+.change-password-form input[type="password"], .change-password-form input[type="text"], .change-password-form input[type="email"] {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1.5px solid #00ffe7;
+  background: #161b22;
+  color: #fff;
+  font-size: 1.08rem;
+  outline: none;
+  transition: border 0.2s;
+}
+.change-password-form input:focus {
+  border-color: #00c2ab;
+}
+.password-toggle {
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #00c2ab;
+  font-size: 1.15rem;
+  background: none;
+  border: none;
+}
+.change-password-form .input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.change-password-form button {
+  margin-top: 8px;
+}
+.otp-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  align-items: center;
+  justify-content: center;
+}
+.otp-group input {
+  max-width: 120px;
+  text-align: center;
+}
+.otp-group button {
+  margin: 0;
+  padding: 7px 16px;
+}
+/* Light mode improvements for visibility */
+body.light-mode {
+  background: #f5f8fa;
+  color: #1a1a1a;
+}
+body.light-mode .main-content {
+  background: #f5f8fa;
+  color: #1a1a1a;
+}
+body.light-mode .sidebar {
+  background: #fafdff;
+  color: #1a1a1a;
+  box-shadow: 2px 0 10px #00c2ab10;
+}
+body.light-mode #sidebar-username {
+  color: #00c2ab;
+}
+body.light-mode .profile-card {
+  background: #fff;
+  color: #1a1a1a;
+  border-color: #00c2ab;
+  box-shadow: none;
+}
+body.light-mode .profile-card .name,
+body.light-mode .section-title {
+  color: #00c2ab;
+  text-shadow: none;
+  filter: none;
+}
+body.light-mode .custom-message {
+  background: #fafdff;
+  color: #ff3864;
+  border-color: #ff3864;
+  box-shadow: none;
+}
+body.light-mode table {
+  box-shadow: none;
+}
+body.light-mode table th {
+  background: #00c2ab;
+  color: #fff;
+  text-shadow: none;
+}
+body.light-mode table td {
+  background: #fff;
+  color: #222;
+}
+body.light-mode .status-badge {
+  border-color: #00c2ab;
+  box-shadow: none;
+  background: #e6f7f7;
+  color: #00c2ab;
+}
+body.light-mode .status-pending {
+  background: #ffe9b3;
+  color: #a67c00;
+}
+body.light-mode .status-inprogress {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+body.light-mode .status-delivered {
+  background: #e6ffe9;
+  color: #2e7d32;
+}
+body.light-mode .status-cancelled {
+  background: #ffe6ec;
+  color: #d32f2f;
+}
+body.light-mode .header-bar .header-btn {
+  background: #00c2ab;
+  color: #fff;
+  box-shadow: none;
+}
+body.light-mode .header-bar .header-btn:hover {
+  background: #00ffe7;
+  color: #1a1a1a;
+}
+body.light-mode .sidebar .logo-title {
+  color: #00c2ab;
+  text-shadow: none;
+  filter: none;
+}
+body.light-mode .sidebar a {
+  color: #1a1a1a;
+  background: none;
+}
+body.light-mode .sidebar a.active, body.light-mode .sidebar a:hover {
+  background: #e6f7f7;
+  color: #00c2ab;
+  box-shadow: none;
+}
+body.light-mode .badge {
+  background: #ff3864;
+  color: #fff;
+  box-shadow: none;
+}
+body.light-mode .change-password-form input[type="password"],
+body.light-mode .change-password-form input[type="text"],
+body.light-mode .change-password-form input[type="email"] {
+  background: #fafdff;
+  color: #1a1a1a;
+  border: 1.5px solid #00c2ab;
+}
+body.light-mode .change-password-form input:focus {
+  border-color: #00ffe7;
+}
+body.light-mode .change-password-form button {
+  background: #00c2ab;
+  color: #fff;
+  box-shadow: none;
+}
+body.light-mode .change-password-form button:hover {
+  background: #00ffe7;
+  color: #1a1a1a;
+}
+@media (max-width: 600px) {
+  .sidebar { width: 100vw; height: auto; position: static; box-shadow: none; padding: 0; }
+  .main-content { margin-left: 0; padding: 14px; }
+  .header-bar { left: 0; padding: 0 8px; }
+}
+.logo-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+}
+.logo-title {
+  margin-top: 7px;
+}
+.tagline {
+  text-align: center;
+  color: #00ffe7;
+  font-size: 1.02rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  margin-top: 0.15rem;
+  margin-bottom: 0.5rem;
+  font-family: 'Poppins', sans-serif;
+  user-select: none;
+}
+body.light-mode .tagline {
+  color: #00796b;
+}
+/* Mobile Responsive Styles */
+@media (max-width: 600px) {
+  .sidebar {
+    width: 100vw;
+    height: auto;
+    position: static;
+    box-shadow: none;
+    padding: 0;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+  .logo-img {
+    height: 40px;
+    width: 40px;
+  }
+  .logo-title {
+    font-size: 1rem;
+    margin-top: 4px;
+  }
+  .tagline {
+    font-size: 0.92rem;
+    margin-bottom: 0.3rem;
+    letter-spacing: 0.3px;
+    padding: 0 0.2rem;
+  }
+  .main-content {
+    margin-left: 0;
+    padding: 14px;
+  }
+}
+@media (max-width: 900px) {
+  .sidebar {
+    width: 100vw;
+    height: auto;
+    position: static;
+    box-shadow: none;
+    padding: 0;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+  .main-content {
+    margin-left: 0;
+    padding: 14px 4px 24px 4px;
+  }
+  .header-bar {
+    left: 0;
+    padding: 0 8px;
+    position: static;
+    width: 100vw;
+    box-sizing: border-box;
+  }
+}
+/* For smaller screens (phones) */
+@media (max-width: 600px) {
+  .sidebar {
+    flex-direction: row;
+    width: 100vw;
+    height: auto;
+    padding: 0.5rem 0.2rem;
+    align-items: center;
+    justify-content: center;
+    box-shadow: none;
+  }
+  .logo-link {
+    flex-direction: column;
+    align-items: center;
+    margin: 12px 0 8px 0;
+    gap: 0.2rem;
+  }
+  .logo-img {
+    height: 38px;
+    width: 38px;
+  }
+  .logo-title {
+    font-size: 1.02rem;
+    margin-top: 3px;
+  }
+  .tagline {
+    font-size: 0.92rem;
+    margin-bottom: 0.2rem;
+    letter-spacing: 0.3px;
+    padding: 0 0.2rem;
+  }
+  .main-content {
+    margin-left: 0;
+    padding: 12px 2px 24px 2px;
+  }
+  .header-bar {
+    position: static;
+    left: 0;
+    right: 0;
+    width: 100vw;
+    padding: 0 5px;
+    gap: 6px;
+    font-size: 0.97rem;
+  }
+  .header-bar .header-btn {
+    padding: 8px 10px;
+    font-size: 1rem;
+    border-radius: 8px;
+    margin-left: 4px;
+  }
+}
+/* Optional: Make profile card and tables more mobile-friendly */
+@media (max-width: 600px) {
+  .profile-card {
+    padding: 14px 6px;
+    max-width: 98vw;
+    font-size: 0.97rem;
+  }
+  table th, table td {
+    padding: 8px;
+    font-size: 0.98rem;
+  }
+  .section-title {
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+  }
+}
+@media (max-width: 600px) {
+  .main-content {
+    padding: 70px 4px 18px 4px;
+    margin-left: 0;
+    width: 100vw;
+    min-width: 0;
+  }
+  .header-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 48px;
+    padding: 0 4px;
+    background: #161b22;
+    z-index: 1100;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+}
+.hamburger {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #00ffe7;
+  margin: 12px 0 0 12px;
+  cursor: pointer;
+  z-index: 2000;
+  display: none;
+}
+@media (max-width: 600px) {
+  .hamburger {
+    display: block;
+  }
+  .sidebar-menu {
+    display: none;
+    position: absolute;
+    top: 48px; /* adjust if your header-bar is fixed */
+    left: 0;
+    width: 100vw;
+    background: #161b22;
+    box-shadow: 0 4px 10px #00ffe72a;
+    z-index: 2000;
+    padding-bottom: 16px;
+  }
+  .sidebar-menu.active {
+    display: block;
+  }
+  .sidebar-user,
+  .sidebar-nav {
+    display: block;
+  }
+}
+.track-order-section {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 70vh;
+}
+
+.track-order-card {
+  background: #161b22;
+  border-radius: 18px;
+  box-shadow: 0 0 18px #00ffe7a0;
+  padding: 2.2em 2em 2em 2em;
+  max-width: 400px;
+  width: 100%;
+  margin: 2em auto;
+  text-align: center;
+}
+
+.track-order-card h2 {
+  color: #00ffe7;
+  margin-bottom: 1.2em;
+  font-size: 1.4em;
+  text-shadow: 0 0 10px #00ffe7;
+}
+
+#trackOrderForm {
+  display: flex;
+  gap: 0.5em;
+  margin-bottom: 1.1em;
+  justify-content: center;
+}
+
+#trackOrderForm input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1.5px solid #00ffe7;
+  background: #161b22;
+  color: #c9d1d9;
+  font-size: 1em;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+#trackOrderForm input:focus {
+  border-color: #00c2ab;
+}
+
+#trackOrderForm button {
+  padding: 10px 22px;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(90deg,#00ffe7 0%,#00c2ab 100%);
+  color: #0d1117;
+  font-weight: 600;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#trackOrderForm button:hover {
+  background: linear-gradient(90deg,#00c2ab 0%,#00ffe7 100%);
+}
+
+.order-tracking-result {
+  margin-top: 1.5em;
+  color: #c9d1d9;
+  font-size: 1.07em;
+  background: #23272f;
+  border-radius: 8px;
+  padding: 1.2em;
+  text-align: left;
+  min-height: 2em;
+}
+
+.order-tracking-status {
+  font-weight: bold;
+  font-size: 1.13em;
+}
+.order-tracking-status.approved { color: #00ffe7; }
+.order-tracking-status.delivered { color: #43e97b; }
+.order-tracking-status.pending { color: #ffb300; }
+.order-tracking-status.other { color: #fff; }
+.order-tracking-payment.fullPaid { color: #43e97b; }
+.order-tracking-payment.advancePaid { color: #00ffe7; }
+.order-tracking-payment.none { color: #ff3864; }
+@media (max-width: 600px) {
+  .track-order-card { padding: 1.2em 0.5em; }
+}
+  </style>
+</head>
+<body>
+  <div id="error-banner"></div>
+  <div class="sidebar">
+  <button class="hamburger" onclick="toggleSidebarMenu()">☰</button>
+  <a href="/index.html" class="logo-link">
+    <img src="images/logo.jpg" alt="Yantrakart Logo" class="logo-img" />
+    <div class="logo-title">Yantrakart</div>
+    <div class="tagline">Smart Projects for Smart Students</div>
+  </a>
+  <!-- New: Wrap user and nav in sidebar-menu for toggling -->
+  <div id="sidebar-menu" class="sidebar-menu">
+    <div class="sidebar-user" id="sidebar-user">
+      <div id="sidebar-username">User</div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#" id="nav-profile" onclick="showProfile();setActive(this)">👤 Profile</a>
+      <a href="#" id="nav-password" onclick="showChangePassword();setActive(this)">🔑 Change Password</a>
+      <a href="#" id="nav-contact" onclick="showChangeContact();setActive(this)">✉️ Change Email/Phone</a>
+      <a href="#" id="nav-orders" onclick="showOrders();setActive(this)">📝 My Orders</a>
+      <a href="#" id="nav-trackorder" onclick="showTrackOrder();setActive(this)">📦 Track Order</a>
+      <a href="#" id="nav-coupons" onclick="showCoupons();setActive(this)">🏷️ My Coupons</a>
+      <a href="#" id="nav-notifications" onclick="showNotifications();setActive(this)">
+        🔔 Notifications <span class="badge" id="notif-badge" style="display:none;">0</span>
+      </a>
+      <a href="#" id="nav-referral" onclick="showReferral();setActive(this)">🎁 Referral Program</a>
+      <a href="contact.html" id="nav-support">🛠️ Support / Contact Us</a>
+    </nav>
+  </div>
+</div>
+
+  <div class="header-bar">
+    <button class="header-btn" onclick="toggleTheme()">🌙/☀️ Theme</button>
+    <button class="header-btn" onclick="logout()">🚪 Log Out</button>
+  </div>
+  <div class="main-content" id="main-content"></div>
+  </div>
+</div>
+
+  <div id="recaptcha-container"></div>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
+});
+
+function isValidEmail(email) {
+  return /\S+@\S+\.\S+/.test(email);
+}
+function isValidPhone(phone) {
+  return /^(\+91[\-\s]?)?[6-9]\d{9}$/.test(phone);
+}
+function showError(msg) {
+  const banner = document.getElementById('error-banner');
+  banner.textContent = msg;
+  banner.style.display = 'block';
+  setTimeout(() => { banner.style.display = 'none'; }, 6000);
+}
+
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyCyjqvnrgCHt3SR4_kD3glRt55ImeXOxxA",
+  authDomain: "yantrakartcu.firebaseapp.com",
+  projectId: "yantrakartcu",
+  storageBucket: "yantrakartcu.firebasestorage.app",
+  messagingSenderId: "958180945232",
+  appId: "1:958180945232:web:18e049c7682da22b239055",
+  measurementId: "G-87FE485DTH"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+function setActive(link) {
+  document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+  if (link) link.classList.add('active');
+}
+function toggleTheme() {
+  document.body.classList.toggle('light-mode');
+  localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+}
+function getCurrentUser() {
+  return new Promise(resolve => {
+    const unsub = auth.onAuthStateChanged(user => { unsub(); resolve(user); });
+  });
+}
+// Sidebar username
+auth.onAuthStateChanged(user => {
+  if (user) document.getElementById('sidebar-username').textContent = user.displayName || "User";
+});
+
+// Profile (view only)
+async function showProfile() {
+  setActive(document.getElementById('nav-profile'));
+  document.getElementById('main-content').innerHTML = `<div class="loading">Loading profile...</div>`;
+  const user = await getCurrentUser();
+  if (!user) { showError("User not logged in."); window.location.href = "/login.html"; return; }
+  let savedName = localStorage.getItem("displayName") || user.displayName || "";
+  let phone = "", created = "", lastlogin = "";
+  try {
+    const userDoc = await db.collection("users").doc(user.uid).get();
+    if (userDoc.exists) {
+      phone = userDoc.data().phone || "";
+      created = userDoc.data().createdAt ? new Date(userDoc.data().createdAt.seconds*1000).toLocaleDateString() : "";
+      lastlogin = userDoc.data().lastLogin ? new Date(userDoc.data().lastLogin.seconds*1000).toLocaleString() : "";
+    }
+  } catch (e) {
+    showError("Could not fetch user details.");
+  }
+  let showEmail = !(user.email.endsWith("@phoneuser.yantrakart"));
+  let showPhone = !!phone;
+  document.getElementById('main-content').innerHTML = `
+    <div class="profile-card">
+      <div class="name" id="user-name">${savedName}</div>
+      ${showEmail ? `<div class="email"><b>Email:</b> ${user.email}</div>` : ""}
+      ${showPhone ? `<div class="phone"><b>Phone:</b> ${phone}</div>` : ""}
+      <div class="created"><b>Account Created:</b> ${created || "N/A"}</div>
+      <div class="lastlogin"><b>Last Login:</b> ${lastlogin || "N/A"}</div>
+    </div>
+  `;
+}
+
+// Modern Change Password
+function showChangePassword() {
+  setActive(document.getElementById('nav-password'));
+  document.getElementById('main-content').innerHTML = `
+    <div class="profile-card">
+      <h3 style="margin-bottom:18px;">Change Password</h3>
+      <form id="change-password-form" class="change-password-form">
+        <div class="input-group">
+          <input type="password" id="oldPassword" placeholder="Old Password" required autocomplete="current-password">
+          <button class="password-toggle" type="button" onclick="togglePass('oldPassword', this)">👁️</button>
+        </div>
+        <div class="input-group">
+          <input type="password" id="newPassword" placeholder="New Password" required autocomplete="new-password">
+          <button class="password-toggle" type="button" onclick="togglePass('newPassword', this)">👁️</button>
+        </div>
+        <div class="input-group">
+          <input type="password" id="confirmPassword" placeholder="Confirm New Password" required autocomplete="new-password">
+          <button class="password-toggle" type="button" onclick="togglePass('confirmPassword', this)">👁️</button>
+        </div>
+        <button type="submit">Update Password</button>
+      </form>
+      <div id="change-password-msg" style="margin-top:10px;"></div>
+    </div>
+  `;
+  document.getElementById('change-password-form').onsubmit = async function(e) {
+    e.preventDefault();
+    const oldPass = document.getElementById('oldPassword').value;
+    const newPass = document.getElementById('newPassword').value;
+    const confirmPass = document.getElementById('confirmPassword').value;
+    const msg = document.getElementById('change-password-msg');
+    msg.textContent = '';
+    if (newPass !== confirmPass) {
+      msg.textContent = "New passwords do not match.";
+      msg.style.color = "#ff3864";
+      return;
+    }
+    const user = auth.currentUser;
+    const cred = firebase.auth.EmailAuthProvider.credential(user.email, oldPass);
+    try {
+      await user.reauthenticateWithCredential(cred);
+      await user.updatePassword(newPass);
+      msg.textContent = "Password updated successfully!";
+      msg.style.color = "#00ffe7";
+    } catch (err) {
+      msg.textContent = "Incorrect old password or error: " + err.message;
+      msg.style.color = "#ff3864";
+    }
+  };
+}
+function togglePass(id, btn) {
+  const input = document.getElementById(id);
+  if (input.type === "password") {
+    input.type = "text";
+    btn.textContent = "🙈";
+  } else {
+    input.type = "password";
+    btn.textContent = "👁️";
+  }
+}
+function toggleSidebarMenu() {
+  const menu = document.getElementById('sidebar-menu');
+  menu.classList.toggle('active');
+}
+function showTrackOrder() {
+  setActive(document.getElementById('nav-trackorder'));
+  document.getElementById('main-content').innerHTML = `
+    <div class="track-order-section">
+      <div class="track-order-card">
+        <h2>Track Your Order</h2>
+        <form id="trackOrderForm" autocomplete="off">
+          <input type="text" id="trackOrderId" maxlength="30" placeholder="Enter your Order ID" required />
+          <button type="submit">Track</button>
+        </form>
+        <div id="orderTrackingResult" class="order-tracking-result"></div>
+      </div>
+    </div>
+  `;
+  const trackOrderForm = document.getElementById('trackOrderForm');
+  const trackOrderId = document.getElementById('trackOrderId');
+  const orderTrackingResult = document.getElementById('orderTrackingResult');
+
+  trackOrderForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const orderId = trackOrderId.value.trim();
+    orderTrackingResult.innerHTML = "Loading...";
+    if (!orderId) {
+      orderTrackingResult.innerHTML = "<span style='color:#ff3864'>Please enter a valid Order ID.</span>";
+      return;
+    }
+    try {
+      const q = await db.collection("orders").where("orderId", "==", orderId).limit(1).get();
+      if (q.empty) {
+        orderTrackingResult.innerHTML = "<span style='color:#ff3864'>Order not found. Please check your Order ID.</span>";
+        return;
+      }
+      const order = q.docs[0].data();
+      let statusClass = "other";
+      if (order.status === "pending") statusClass = "pending";
+      else if (order.status === "approved") statusClass = "approved";
+      else if (order.status === "delivered") statusClass = "delivered";
+      let paymentClass = order.paymentState || "none";
+      let paymentStatus = order.paymentState ? order.paymentState.replace(/([A-Z])/g, ' $1').toUpperCase() : "NOT PAID";
+      orderTrackingResult.innerHTML = `
+        <div><b>Project:</b> ${order.projectName || "-"}</div>
+        <div><b>Order ID:</b> ${order.orderId || "-"}</div>
+        <div><b>Status:</b> <span class="order-tracking-status ${statusClass}">${order.status ? order.status.toUpperCase() : "-"}</span></div>
+        <div><b>Payment:</b> <span class="order-tracking-payment ${paymentClass}">${paymentStatus}</span></div>
+        <div><b>Price:</b> ₹${order.projectPrice ? Number(order.projectPrice).toLocaleString("en-IN") : "-"}</div>
+        <div><b>Final Amount:</b> ₹${order.finalAmount ? Number(order.finalAmount).toLocaleString("en-IN") : "-"}</div>
+        <div><b>Created At:</b> ${order.createdAt && order.createdAt.seconds ? new Date(order.createdAt.seconds * 1000).toLocaleString() : "-"}</div>
+        ${order.status === "delivered" && order.paymentState === "fullPaid" ? `<div style="margin-top:1em;"><a href="payment.html?orderId=${order.orderId}" target="_blank" style="color:#43e97b;font-weight:600;">⬇️ Download Invoice</a></div>` : ""}
+      `;
+    } catch (err) {
+      orderTrackingResult.innerHTML = `<span style='color:#ff3864'>Error: ${err.message}</span>`;
+    }
+  });
+}
+
+
+// Change Email/Phone (email user: change email, phone user: change phone, with OTP for phone)
+function showChangeContact() {
+  setActive(document.getElementById('nav-contact'));
+  const user = auth.currentUser;
+  const isPhoneUser = user.email.endsWith("@phoneuser.yantrakart");
+  document.getElementById('main-content').innerHTML = `
+    <div class="profile-card">
+      <h3>${isPhoneUser ? "Change Phone" : "Change Email"}</h3>
+      <form id="change-contact-form" class="change-password-form">
+        <div>
+          ${isPhoneUser
+            ? `Current Phone: <b id="current-phone"></b>`
+            : `Current Email: <b id="current-email"></b>`
+          }
+        </div>
+        <div class="input-group" style="${isPhoneUser ? "" : "display:none;"}">
+          <input type="text" id="newPhone" placeholder="New Phone">
+          <button type="button" class="password-toggle" onclick="togglePass('newPhone', this)">👁️</button>
+        </div>
+        <div class="input-group" style="${!isPhoneUser ? "" : "display:none;"}">
+          <input type="email" id="newEmail" placeholder="New Email">
+          <button type="button" class="password-toggle" onclick="togglePass('newEmail', this)">👁️</button>
+        </div>
+        <div class="input-group">
+          <input type="password" id="contactPassword" placeholder="Enter Password to Confirm">
+          <button class="password-toggle" type="button" onclick="togglePass('contactPassword', this)">👁️</button>
+        </div>
+        <div id="otp-section" style="display:none;"></div>
+        <button type="submit" id="update-contact-btn">Update</button>
+      </form>
+      <div id="change-contact-msg"></div>
+    </div>
+  `;
+  if (isPhoneUser) {
+    db.collection("users").doc(user.uid).get().then(doc => {
+      document.getElementById('current-phone').textContent = doc.exists ? (doc.data().phone || "Not set") : "Not set";
+    });
+  } else {
+    document.getElementById('current-email').textContent = user.email;
+  }
+  let confirmationResult = null;
+  document.getElementById('change-contact-form').onsubmit = async function(e) {
+    e.preventDefault();
+    const newEmail = document.getElementById('newEmail') ? document.getElementById('newEmail').value.trim() : null;
+    const newPhone = document.getElementById('newPhone') ? document.getElementById('newPhone').value.trim() : null;
+    const password = document.getElementById('contactPassword').value;
+    const msg = document.getElementById('change-contact-msg');
+    msg.textContent = '';
+    if (!password) {
+      msg.textContent = "Please enter your password to confirm.";
+      msg.style.color = "#ff3864";
+      return;
+    }
+    const cred = firebase.auth.EmailAuthProvider.credential(user.email, password);
+    try {
+      await user.reauthenticateWithCredential(cred);
+      // Email user: change email
+      if (!isPhoneUser && newEmail) {
+        if (!isValidEmail(newEmail)) {
+          msg.textContent = "Please enter a valid email address.";
+          msg.style.color = "#ff3864";
+          return;
+        }
+        await user.updateEmail(newEmail);
+        msg.textContent = "Email updated!";
+        msg.style.color = "#00ffe7";
+      }
+      // Phone user: change phone, with OTP
+      else if (isPhoneUser && newPhone) {
+        if (!isValidPhone(newPhone)) {
+          msg.textContent = "Please enter a valid 10-digit phone number.";
+          msg.style.color = "#ff3864";
+          return;
+        }
+        document.getElementById('otp-section').innerHTML = `
+          <div class="otp-group">
+            <input type="text" id="otpInput" placeholder="Enter OTP">
+            <button type="button" id="verifyOtpBtn">Verify OTP</button>
+          </div>
+          <div id="otp-msg" style="margin-top:5px;"></div>
+        `;
+        document.getElementById('otp-section').style.display = "block";
+        document.getElementById('update-contact-btn').disabled = true;
+        if (!window.recaptchaVerifier) {
+          window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+            'size': 'invisible'
+          });
+        }
+        firebase.auth().signInWithPhoneNumber("+91" + newPhone.replace(/\D/g, ''), window.recaptchaVerifier)
+          .then(result => {
+            confirmationResult = result;
+            document.getElementById('otp-msg').textContent = "OTP sent to +" + newPhone.replace(/\D/g, '');
+            document.getElementById('otp-msg').style.color = "#00c2ab";
+          })
+          .catch(err => {
+            document.getElementById('otp-msg').textContent = "Error sending OTP: " + err.message;
+            document.getElementById('otp-msg').style.color = "#ff3864";
+            document.getElementById('update-contact-btn').disabled = false;
+          });
+        document.getElementById('verifyOtpBtn').onclick = async function() {
+          const code = document.getElementById('otpInput').value.trim();
+          if (!code) {
+            document.getElementById('otp-msg').textContent = "Please enter the OTP.";
+            document.getElementById('otp-msg').style.color = "#ff3864";
+            return;
+          }
+          try {
+            const result = await confirmationResult.confirm(code);
+            await db.collection("users").doc(user.uid).set({ phone: newPhone }, { merge: true });
+            await user.updatePhoneNumber(result.credential);
+            document.getElementById('otp-msg').textContent = "Phone updated successfully!";
+            document.getElementById('otp-msg').style.color = "#00ffe7";
+            document.getElementById('update-contact-btn').disabled = false;
+          } catch (err) {
+            document.getElementById('otp-msg').textContent = "OTP verification failed: " + err.message;
+            document.getElementById('otp-msg').style.color = "#ff3864";
+            document.getElementById('update-contact-btn').disabled = false;
+          }
+        };
+        return;
+      }
+      if ((!newEmail && !isPhoneUser) || (!newPhone && isPhoneUser)) {
+        msg.textContent = "Nothing to update.";
+        msg.style.color = "#ff3864";
+      }
+    } catch (err) {
+      msg.textContent = "Error: " + err.message;
+      msg.style.color = "#ff3864";
+    }
+  };
+}
+
+// Referral Program: Share code and link
+async function showReferral() {
+  setActive(document.getElementById('nav-referral'));
+  const user = await getCurrentUser();
+  if (!user) return window.location.href = "/login.html";
+  let referralCode = user.uid.slice(0,8);
+  try {
+    let userDoc = await db.collection("users").doc(user.uid).get();
+    if (userDoc.exists && userDoc.data().referralCode) referralCode = userDoc.data().referralCode;
+    else await db.collection("users").doc(user.uid).set({ referralCode }, { merge: true });
+  } catch (e) {}
+  const referralLink = `${window.location.origin}/login.html`;
+  document.getElementById('main-content').innerHTML = `
+    <div class="profile-card">
+      <div class="section-title">Referral Program</div>
+      <div><b>Your Referral Code:</b> <span style="color:#00ffe7">${referralCode}</span></div>
+      <button class="share-btn" onclick="shareReferral('${referralCode}', '${referralLink}')">Share Referral Code</button>
+      <div style="margin:18px 0 10px 0;font-size:1.12rem;color:#00ffe7;font-weight:600;">
+        Share your code with friends! They can enter it during checkout.
+      </div>
+      <div style="color:#fff;text-align:left;font-size:1.04rem;margin-bottom:12px;">
+        <ul style="margin-left:20px;">
+          <li>You earn <b>5% commission</b> on each of the <b>first 5 orders</b> placed by every friend who uses your code during checkout. The commission is given as a coupon for your next order.</li>
+          <li>For orders after the 5th, you earn <b>2% commission</b> per order.</li>
+        </ul>
+      </div>
+    </div>
+  `;
+}
+
+function shareReferral(code, link) {
+  const msg = 
+    `🎉 Hey! I'm loving Yantrakart and wanted to share something special with you! 🎁\n\n` +
+    `👉 Sign up or log in here: ${link}\n` +
+    `📝 Enter my referral code: **${code}** during your first order checkout.\n\n` +
+    `✨ You'll get a 2% OFF coupon for your next purchase, and I'll get a reward too! Let's save together! 🚀\n\n` +
+    `#Yantrakart #Referral #Discount`;
+  if (navigator.share) {
+    navigator.share({
+      title: "Yantrakart Referral 🎁",
+      text: msg
+    });
+  } else {
+    navigator.clipboard.writeText(msg);
+    alert("Referral message copied! Share it with your friends.");
+  }
+}
+
+// Coupons section
+async function showCoupons() {
+  setActive(document.getElementById('nav-coupons'));
+  const user = await getCurrentUser();
+  if (!user) return window.location.href = "/login.html";
+  db.collection("coupons")
+    .where("userId", "==", user.uid)
+    .orderBy("createdAt", "desc")
+    .onSnapshot(snapshot => {
+      let html = `<div class="profile-card"><div class="section-title">My Coupons</div>`;
+      if (snapshot.empty) {
+        html += `<div class="custom-message">No coupons yet. Refer friends to earn coupons!</div>`;
+      } else {
+        html += `<table>
+          <tr><th>Coupon Code</th><th>Discount</th><th>Status</th></tr>`;
+        snapshot.forEach(doc => {
+          const d = doc.data();
+          html += `<tr>
+            <td>${d.code}</td>
+            <td>₹${d.discount}</td>
+            <td>${d.used ? "Used" : "Unused"}</td>
+          </tr>`;
+        });
+        html += `</table>`;
+      }
+      html += `</div>`;
+      document.getElementById('main-content').innerHTML = html;
+    });
+}
+
+// Orders section
+async function showOrders() {
+  setActive(document.getElementById('nav-orders'));
+  document.getElementById('main-content').innerHTML = `<div class="loading">Loading orders...</div>`;
+  const user = await getCurrentUser();
+  if (!user) { showError("User not logged in."); window.location.href = "/login.html"; return; }
+  db.collection("orders")
+    .where("userId", "==", user.uid)
+    .orderBy("createdAt", "desc")
+    .onSnapshot(snapshot => {
+      let html = `<div class="section-title">My Orders</div>`;
+      if (snapshot.empty) {
+        html += `<div class="custom-message">No orders yet.</div>`;
+      } else {
+        html += `<table>
+          <tr><th>Order Date</th><th>Referral Code Used</th><th>Coupon Used</th><th>Discount</th><th>Final Amount</th></tr>`;
+        snapshot.forEach(doc => {
+          const d = doc.data();
+          html += `<tr>
+            <td>${d.createdAt ? new Date(d.createdAt.seconds*1000).toLocaleDateString() : "-"}</td>
+            <td>${d.referralCode || "-"}</td>
+            <td>${d.couponCode || "-"}</td>
+            <td>${d.discount ? "₹" + d.discount : "-"}</td>
+            <td>${d.finalAmount ? "₹" + d.finalAmount : "-"}</td>
+          </tr>`;
+        });
+        html += `</table>`;
+      }
+      document.getElementById('main-content').innerHTML = html;
+    }, err => {
+      document.getElementById('main-content').innerHTML = `<div class="custom-message">No orders yet.</div>`;
+    });
+}
+
+// Notifications section (with error handling)
+async function showNotifications() {
+  setActive(document.getElementById('nav-notifications'));
+  document.getElementById('main-content').innerHTML = `<div class="loading">Loading notifications...</div>`;
+  const user = await getCurrentUser();
+  if (!user) { showError("User not logged in."); window.location.href = "/login.html"; return; }
+
+  let userIdentifier = user.email;
+  let userDoc = await db.collection("users").doc(user.uid).get();
+  if (userDoc.exists && userDoc.data().phone) {
+    userIdentifier = user.email.endsWith("@phoneuser.yantrakart") ? userDoc.data().phone : user.email;
+  }
+
+  // 1. Mark all unread notifications as read
+  db.collection("notifications")
+    .where("userEmail", "==", userIdentifier)
+    .where("read", "==", false)
+    .get()
+    .then(snapshot => {
+      if (!snapshot.empty) {
+        const batch = db.batch();
+        snapshot.forEach(doc => {
+          batch.update(doc.ref, { read: true });
+        });
+        return batch.commit();
+      }
+    });
+
+  // 2. Show all notifications
+  db.collection("notifications")
+    .where("userEmail", "==", userIdentifier)
+    .orderBy("createdAt", "desc")
+    .onSnapshot(
+      snapshot => {
+        let html = `<div class="section-title">Notifications</div>`;
+        if (snapshot.empty) {
+          html += `<div class="custom-message">No notifications.</div>`;
+        } else {
+          html += `<ul style="padding-left:0;">`;
+          snapshot.forEach(doc => {
+            const d = doc.data();
+            html += `<li style="margin-bottom:18px;list-style:none;">
+              <div style="color:#00e3ca;font-weight:600;">
+                ${d.createdAt ? new Date(d.createdAt.seconds*1000).toLocaleString() : ""}
+                ${!d.read ? '<span style="color:#ff3864; margin-left:8px;">● Unread</span>' : ''}
+              </div>
+              <div>${d.message}</div>
+            </li>`;
+          });
+          html += `</ul>`;
+        }
+        document.getElementById('main-content').innerHTML = html;
+      },
+      err => {
+        document.getElementById('main-content').innerHTML = `
+          <div class="custom-message">
+            Error loading notifications.<br>
+            <span style="font-size:0.95em;color:#ff3864;">${err.message}</span>
+          </div>`;
+      }
+    );
+}
+
+
+// Notification badge update (real-time)
+getCurrentUser().then(async user => {
+  if (!user) return;
+  let userIdentifier = user.email;
+  let userDoc = await db.collection("users").doc(user.uid).get();
+  if (userDoc.exists && userDoc.data().phone) {
+    userIdentifier = user.email.endsWith("@phoneuser.yantrakart") ? userDoc.data().phone : user.email;
+  }
+  db.collection("notifications")
+    .where("userEmail", "==", userIdentifier)
+    .where("read", "==", false) // Only unread
+    .onSnapshot(snapshot => {
+      const badge = document.getElementById("notif-badge");
+      badge.textContent = snapshot.size;
+      badge.style.display = snapshot.size ? "inline-block" : "none";
+    });
+});
+
+
+// Logout and auth state
+function logout() {
+  auth.signOut().then(() => { window.location.href = "/login.html"; });
+}
+auth.onAuthStateChanged(user => {
+  if (user) showProfile();
+  else window.location.href = "/login.html";
+});
+document.addEventListener('DOMContentLoaded', function() {
+  // ... your existing code ...
+
+  // --- Order Tracking Logic ---
+  const trackOrderForm = document.getElementById('trackOrderForm');
+  const trackOrderId = document.getElementById('trackOrderId');
+  const orderTrackingResult = document.getElementById('orderTrackingResult');
+
+  if (trackOrderForm) {
+    trackOrderForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const orderId = trackOrderId.value.trim();
+      orderTrackingResult.innerHTML = "Loading...";
+      if (!orderId) {
+        orderTrackingResult.innerHTML = "<span style='color:#ff3864'>Please enter a valid Order ID.</span>";
+        return;
+      }
+      try {
+        const q = await db.collection("orders").where("orderId", "==", orderId).limit(1).get();
+        if (q.empty) {
+          orderTrackingResult.innerHTML = "<span style='color:#ff3864'>Order not found. Please check your Order ID.</span>";
+          return;
+        }
+        const order = q.docs[0].data();
+        let statusClass = "other";
+        if (order.status === "pending") statusClass = "status-pending";
+        else if (order.status === "approved") statusClass = "status-approved";
+        else if (order.status === "delivered") statusClass = "status-delivered";
+        let paymentStatus = order.paymentState ? order.paymentState.replace(/([A-Z])/g, ' $1').toUpperCase() : "NOT PAID";
+        orderTrackingResult.innerHTML = `
+          <div><b>Project:</b> ${order.projectName || "-"}</div>
+          <div><b>Order ID:</b> ${order.orderId || "-"}</div>
+          <div><b>Status:</b> <span class="${statusClass}">${order.status ? order.status.toUpperCase() : "-"}</span></div>
+          <div><b>Payment:</b> <span>${paymentStatus}</span></div>
+          <div><b>Price:</b> ₹${order.projectPrice ? Number(order.projectPrice).toLocaleString("en-IN") : "-"}</div>
+          <div><b>Final Amount:</b> ₹${order.finalAmount ? Number(order.finalAmount).toLocaleString("en-IN") : "-"}</div>
+          <div><b>Created At:</b> ${order.createdAt && order.createdAt.seconds ? new Date(order.createdAt.seconds * 1000).toLocaleString() : "-"}</div>
+          ${order.status === "delivered" && order.paymentState === "fullPaid" ? `<div style="margin-top:1em;"><a href="order-details.html?orderId=${order.orderId}" target="_blank" style="color:#43e97b;font-weight:600;">⬇️ Download Invoice</a></div>` : ""}
+        `;
+      } catch (err) {
+        orderTrackingResult.innerHTML = `<span style='color:#ff3864'>Error: ${err.message}</span>`;
+      }
+    });
+  }
+});
+
+</script>
+</body>
+</html>

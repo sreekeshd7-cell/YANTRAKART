@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Yantrakart Payment</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+  <style>
+    body { background: #0d1117; color: #c9d1d9; font-family: 'Poppins', sans-serif; margin: 0; }
+    .container { max-width: 420px; margin: 60px auto; background: #161b22; padding: 32px 24px; border-radius: 18px; box-shadow: 0 0 18px #00ffe7a0; }
+    h1 { color: #00ffe7; text-align: center; }
+    .order-id-entry { text-align: center; margin-bottom: 24px; }
+    .order-id-input { padding: 8px 12px; border-radius: 8px; border: 1.5px solid #30363d; background: #161b22; color: #c9d1d9; font-size: 1em; width: 70%; margin-bottom: 10px;}
+    .order-id-btn { padding: 8px 18px; border-radius: 7px; border: none; background: #00ffe7; color: #0d1117; font-weight: 600; font-size: 1em; cursor: pointer;}
+    .order-id-btn:active { background: #00c2ab; }
+    .order-id-error { color: #ff3864; font-size: 1em; margin-top: 6px;}
+    .order-id-show { color: #00ffe7; font-family: monospace; font-size: 1.05em; margin-bottom: 10px; text-align:center;}
+    .price { font-size: 1.3em; margin: 12px 0; color: #00ffe7; text-align: center; }
+    .section { margin: 18px 0; }
+    .qr { display: block; margin: 0 auto 12px auto; border-radius: 12px; width: 180px; }
+    .upi-btn { display: block; margin: 16px auto; background: linear-gradient(90deg,#00ffe7 0%,#00c2ab 100%); color: #0d1117; border: none; border-radius: 10px; padding: 12px 32px; font-size: 1.08rem; cursor: pointer; font-weight: 600; }
+    .upi-btn:active { background: #00c2ab; }
+    .note { color: #ffb300; text-align: center; margin-top: 10px; }
+    .btn-invoice { background: #00ffe7; color: #0d1117; border: none; border-radius: 8px; padding: 10px 22px; font-weight: 600; margin: 10px auto 0 auto; display: block; cursor: pointer; }
+    .btn-invoice:active { background: #00c2ab; }
+    .paid { color: #43e97b; text-align: center; margin-top: 16px; }
+    .tooltip { border-bottom: 1px dotted #00ffe7; cursor: help; }
+    .tooltiptext {
+      visibility: hidden;
+      width: 220px;
+      background-color: #222;
+      color: #fff;
+      text-align: left;
+      border-radius: 6px;
+      padding: 8px;
+      position: absolute;
+      z-index: 1;
+      left: 110%;
+      top: -5px;
+      font-size: 0.98em;
+    }
+    .tooltip:hover .tooltiptext { visibility: visible; }
+    .status-row { text-align: center; margin-bottom: 12px; }
+    .order-details-table { width: 100%; margin: 0 auto 10px auto; border-collapse: collapse; }
+    .order-details-table td { padding: 4px 8px; color: #ccc; }
+    .order-details-table tr td:first-child { color: #00ffe7; font-weight: 600;}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>UPI Payment</h1>
+    <div id="orderIdEntry" class="order-id-entry" style="display:none;">
+      <label for="orderIdInput"><b>Enter your Order ID to view payment details:</b></label><br>
+      <input type="text" id="orderIdInput" class="order-id-input" maxlength="30" placeholder="Paste your Order ID"/>
+      <button class="order-id-btn" id="fetchOrderBtn">Show Details</button>
+      <div id="orderIdError" class="order-id-error"></div>
+    </div>
+    <div id="orderDetailsSection" style="display:none;">
+      <div class="order-id-show" id="orderIdShow"></div>
+      <table class="order-details-table">
+        <tr><td>Project</td><td id="projectName"></td></tr>
+        <tr><td>Price</td><td id="projectPrice"></td></tr>
+        <tr><td>Discount</td><td id="discount"></td></tr>
+        <tr><td>Final Amount</td><td id="finalAmount"></td></tr>
+        <tr><td>Status</td><td id="orderStatus"></td></tr>
+      </table>
+      <div class="status-row">
+        <span class="tooltip">
+          <b>Status Info</b>
+          <span class="tooltiptext">
+            <b>Approved:</b> Order accepted by admin. Please pay 50% advance.<br>
+            <b>Delivered:</b> Order delivered. Please pay remaining 50%.
+          </span>
+        </span>
+      </div>
+      <div class="price" id="amountInfo"></div>
+      <div class="section" id="qrSection"></div>
+      <button class="upi-btn" id="upiBtn">Pay via UPI App</button>
+      <div class="note">Scan the QR or tap the button to pay.<br>After payment, please wait for confirmation.</div>
+      <button class="btn-invoice" id="downloadInvoice" style="display:none;">Download Invoice (PDF)</button>
+      <div class="paid" id="paidMsg" style="display:none;">All payments complete. Thank you!</div>
+    </div>
+  </div>
+  <script>
+    // --- CONFIG ---
+    const UPI_ID = "sdkrocks4evr@okaxis";
+    const PAYEE_NAME = "Yantrakart";
+    const QR_IMAGE_URL = "images/qr.jpg"; // Replace with actual QR code image
+
+    // --- FIREBASE INIT ---
+   const firebaseConfig = {
+  apiKey: "AIzaSyCyjqvnrgCHt3SR4_kD3glRt55ImeXOxxA",
+  authDomain: "yantrakartcu.firebaseapp.com",
+  projectId: "yantrakartcu",
+  storageBucket: "yantrakartcu.firebasestorage.app",
+  messagingSenderId: "958180945232",
+  appId: "1:958180945232:web:18e049c7682da22b239055",
+  measurementId: "G-87FE485DTH"
+};
+   
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // --- ELEMENTS ---
+    const orderIdEntry = document.getElementById("orderIdEntry");
+    const orderIdInput = document.getElementById("orderIdInput");
+    const fetchOrderBtn = document.getElementById("fetchOrderBtn");
+    const orderIdError = document.getElementById("orderIdError");
+    const orderDetailsSection = document.getElementById("orderDetailsSection");
+    const orderIdShow = document.getElementById("orderIdShow");
+    const projectNameEl = document.getElementById("projectName");
+    const projectPriceEl = document.getElementById("projectPrice");
+    const discountEl = document.getElementById("discount");
+    const finalAmountEl = document.getElementById("finalAmount");
+    const orderStatusEl = document.getElementById("orderStatus");
+    const amountInfo = document.getElementById("amountInfo");
+    const qrSection = document.getElementById("qrSection");
+    const upiBtn = document.getElementById("upiBtn");
+    const downloadInvoice = document.getElementById("downloadInvoice");
+    const paidMsg = document.getElementById("paidMsg");
+  const user = firebase.auth().currentUser;
+const customerName = user && user.displayName ? user.displayName : "";
+const customerEmail = user && user.email ? user.email : "";
+const customerPhone = user && user.phoneNumber ? user.phoneNumber : "";
+
+
+
+    // --- STATE ---
+    let orderData = null;
+    let paymentState = localStorage.getItem("paymentState") || "none";
+
+    // --- HELPERS ---
+    function showOrderIdEntry() {
+      orderIdEntry.style.display = "block";
+      orderDetailsSection.style.display = "none";
+    }
+    function showOrderDetails() {
+      orderIdEntry.style.display = "none";
+      orderDetailsSection.style.display = "block";
+    }
+    function clearOrderDetails() {
+      orderData = null;
+      localStorage.removeItem("orderId");
+      localStorage.removeItem("finalPrice");
+      localStorage.removeItem("orderStatus");
+      localStorage.removeItem("paymentState");
+    }
+    function setOrderToLocal(order) {
+      localStorage.setItem("orderId", order.orderId);
+      localStorage.setItem("finalPrice", order.finalAmount);
+      localStorage.setItem("orderStatus", order.status);
+      // Don't reset paymentState here
+    }
+
+    function getUpiLink(amount) {
+      return `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amount}&cu=INR&tn=Yantrakart%20Order%20Payment`;
+    }
+
+    // --- MAIN LOGIC ---
+    async function loadOrder(orderId) {
+      orderIdError.textContent = "";
+      try {
+        // Query Firestore for order with this orderId
+        const q = await db.collection("orders").where("orderId", "==", orderId).limit(1).get();
+        if (q.empty) {
+          throw new Error("Order not found. Please check your Order ID.");
+        }
+        const doc = q.docs[0];
+        orderData = doc.data();
+        setOrderToLocal(orderData);
+        displayOrderDetails(orderData);
+      } catch (err) {
+        orderIdError.textContent = err.message;
+        clearOrderDetails();
+      }
+    }
+
+    function displayOrderDetails(order) {
+      showOrderDetails();
+      orderIdShow.textContent = "Order ID: " + order.orderId;
+      projectNameEl.textContent = order.projectName || "N/A";
+      projectPriceEl.textContent = "₹" + (order.projectPrice || 0).toLocaleString("en-IN");
+      discountEl.textContent = "₹" + (order.discount || 0).toLocaleString("en-IN");
+      finalAmountEl.textContent = "₹" + (order.finalAmount || 0).toLocaleString("en-IN");
+      orderStatusEl.textContent = order.status ? order.status.charAt(0).toUpperCase() + order.status.slice(1) : "N/A";
+
+      // Payment logic
+      let amountDue = 0;
+      let paymentLabel = "";
+      if (order.status === "approved") {
+        amountDue = (order.finalAmount || 0) / 2;
+        paymentLabel = "Pay 50% Advance";
+      } else if (order.status === "delivered") {
+        amountDue = (order.finalAmount || 0) / 2;
+        paymentLabel = "Pay Remaining 50%";
+      } else {
+        amountDue = 0;
+        paymentLabel = "Payment not available yet";
+      }
+
+      amountInfo.textContent = amountDue > 0
+        ? `${paymentLabel}: ₹${amountDue.toLocaleString("en-IN",{minimumFractionDigits:2})}`
+        : "Payment not available yet.";
+
+      // Show QR code if needed
+      if (amountDue > 0) {
+        qrSection.innerHTML = `
+          <img src="${QR_IMAGE_URL}" alt="UPI QR Code" class="qr" />
+          <div style="text-align:center;font-size:0.98em;color:#ccc;">UPI ID: <b>${UPI_ID}</b></div>
+        `;
+        upiBtn.style.display = "block";
+      } else {
+        qrSection.innerHTML = "";
+        upiBtn.style.display = "none";
+      }
+
+      // Show invoice download after full payment
+      if (paymentState === "fullPaid") {
+        downloadInvoice.style.display = "block";
+        paidMsg.style.display = "block";
+      } else {
+        downloadInvoice.style.display = "none";
+        paidMsg.style.display = "none";
+      }
+
+      // Store for payment button
+      upiBtn.onclick = function() {
+        if (amountDue > 0) {
+          window.location.href = getUpiLink(amountDue.toFixed(2));
+          // Simulate payment for demo (replace with backend confirmation in production)
+          setTimeout(() => {
+            if (order.status === "approved") {
+              paymentState = "advancePaid";
+              localStorage.setItem("paymentState", paymentState);
+              alert("Advance payment marked as done (for demo).");
+              location.reload();
+            } else if (order.status === "delivered") {
+              paymentState = "fullPaid";
+              localStorage.setItem("paymentState", paymentState);
+              alert("Final payment marked as done (for demo).");
+              downloadInvoice.style.display = "block";
+              paidMsg.style.display = "block";
+            }
+          }, 2000);
+        } else {
+          alert("Payment not available yet.");
+        }
+      };
+
+      // Invoice Download (PDF)
+      downloadInvoice.onclick = function() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  // --- YOUR BUSINESS INFO ---
+  const business = {
+    name: "YANTRAKART",
+    address: "Near Chandigarh University Campus,Gharuan,140301",
+    phone: "+91-9150503296",
+    email: "sreekeshd7@gmail.com"
+  };
+
+  // --- CUSTOMER INFO ---
+  const customer = {
+    name: order.customerName || "N/A",
+    email: order.email || "N/A",
+    phone: order.phone || "N/A",
+  };
+
+  // --- HEADER ---
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(22);
+  doc.setTextColor(0, 255, 231);
+  doc.text(business.name, 14, 16);
+
+  doc.setFontSize(12);
+  doc.setTextColor(33, 37, 41);
+  doc.setFont("helvetica", "normal");
+  doc.text("INVOICE", 150, 16);
+
+  // --- BUSINESS CONTACT ---
+  doc.setFontSize(10);
+  doc.text(`Address: ${business.address}`, 14, 24);
+  doc.text(`Phone: ${business.phone}`, 14, 29);
+  doc.text(`Email: ${business.email}`, 14, 34);
+
+  // --- CUSTOMER DETAILS ---
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.text("Bill To:", 14, 45);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.text(`Name: ${customer.name}`, 14, 50);
+  doc.text(`Email: ${customer.email}`, 14, 55);
+  doc.text(`Phone: ${customer.phone}`, 14, 60);
+
+  // --- INVOICE META ---
+  doc.setFontSize(10);
+  doc.text(`Invoice Date: ${new Date().toLocaleDateString()}`, 150, 24);
+  doc.text(`Order ID: ${order.orderId || "N/A"}`, 150, 29);
+  doc.text(`Status: DELIVERED`, 150, 34);
+
+  // --- PROJECT DETAILS TABLE ---
+  const tableColumn = ["Description", "Amount (₹)"];
+  const tableRows = [
+    ["Project", order.projectName || "N/A"],
+    ["Original Price", (order.projectPrice || 0).toLocaleString("en-IN",{minimumFractionDigits:2})],
+    ["Discount", (order.discount || 0).toLocaleString("en-IN",{minimumFractionDigits:2})],
+    ["Total Price", (order.finalAmount || 0).toLocaleString("en-IN",{minimumFractionDigits:2})],
+    ["Advance Paid (50%)", ((order.finalAmount || 0)/2).toLocaleString("en-IN",{minimumFractionDigits:2})],
+    ["Final Paid (50%)", ((order.finalAmount || 0)/2).toLocaleString("en-IN",{minimumFractionDigits:2})]
+  ];
+
+  doc.autoTable({
+    startY: 75,
+    head: [tableColumn],
+    body: tableRows,
+    theme: 'grid',
+    headStyles: { fillColor: [0, 255, 231], textColor: [13, 17, 23], fontStyle: 'bold' },
+    bodyStyles: { textColor: [33, 37, 41] },
+    styles: { font: "helvetica", fontSize: 11, cellPadding: 3 },
+    columnStyles: { 1: { halign: 'right' } }
+  });
+
+  // --- FOOTER ---
+  doc.setFontSize(12);
+  doc.setTextColor(67, 233, 123);
+  doc.text("Thank you for Ordering with us!", 105, doc.lastAutoTable.finalY + 18, { align: "center" });
+
+  doc.setFontSize(10);
+  doc.setTextColor(180, 180, 180);
+  doc.text(`For support, contact: ${business.email} | ${business.phone}`, 105, doc.lastAutoTable.finalY + 26, { align: "center" });
+
+  doc.save("Yantrakart_Invoice.pdf");
+      }
+};
+
+
+    // --- ENTRY LOGIC ---
+    // Try to get orderId from localStorage or URL
+    function getQueryParam(name) {
+      return new URLSearchParams(window.location.search).get(name);
+    }
+    let orderId = localStorage.getItem("orderId") || getQueryParam("orderId") || "";
+
+    if (!orderId) {
+      showOrderIdEntry();
+    } else {
+      loadOrder(orderId);
+    }
+
+    fetchOrderBtn.onclick = function() {
+      const id = orderIdInput.value.trim();
+      if (!id) {
+        orderIdError.textContent = "Please enter your Order ID.";
+        return;
+      }
+      loadOrder(id);
+    
+    };
+  </script>
+</body>
+</html>

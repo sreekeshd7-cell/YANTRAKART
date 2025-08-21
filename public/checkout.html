@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Checkout | Yantrakart</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-color: #0d1117;
+      --text-color: #c9d1d9;
+      --accent-color: #00ffe7;
+      --input-bg: #161b22;
+      --input-border: #30363d;
+      --error: #ff4d4d;
+      --success: #43e97b;
+    }
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1rem;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .checkout-box {
+      background-color: var(--input-bg);
+      padding: 2rem;
+      border-radius: 14px;
+      box-shadow: 0 0 20px rgba(0, 255, 231, 0.5);
+      width: 100%;
+      max-width: 500px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: var(--accent-color);
+      text-shadow: 0 0 10px var(--accent-color);
+    }
+    .product-info {
+      margin-bottom: 1.5rem;
+    }
+    .product-info p {
+      font-size: 1rem;
+      margin: 5px 0;
+    }
+    .product-info .total {
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+    .product-info .final-payment {
+      font-weight: bold;
+      font-size: 1.22rem;
+      color: var(--accent-color);
+      margin-top: 0.5rem;
+    }
+    label {
+      display: block;
+      margin-top: 12px;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    input[type="text"], input[type="tel"] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1.5px solid var(--input-border);
+      background: var(--input-bg);
+      color: var(--text-color);
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input[type="text"]:focus, input[type="tel"]:focus {
+      border-color: var(--accent-color);
+    }
+    button, .nav-btn {
+      width: 100%;
+      padding: 0.8rem;
+      background: var(--accent-color);
+      color: var(--bg-color);
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: background-color 0.3s ease;
+      margin-top: 1.5rem;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+    }
+    button:disabled {
+      background-color: #444;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    button:hover:not(:disabled), .nav-btn:hover {
+      background-color: #00c2ab;
+    }
+    .info-text {
+      margin-top: 6px;
+      font-size: 0.9rem;
+      color: var(--text-color);
+    }
+    .referrer-name {
+      margin-top: 4px;
+      font-size: 0.95rem;
+      color: var(--accent-color);
+      font-weight: 600;
+    }
+    .error {
+      color: var(--error);
+      margin-top: 1rem;
+      text-align: center;
+      font-size: 0.95rem;
+      min-height: 1.2em;
+    }
+    .success {
+      color: var(--success);
+      margin-top: 1rem;
+      text-align: center;
+      font-size: 1.05rem;
+      min-height: 1.2em;
+      font-weight: 600;
+    }
+    .emoji-success {
+      font-size: 2.2rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .success-notification {
+      text-align: center;
+      margin-top: 1.2rem;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #43e97b;
+    }
+    .success-notification ul {
+      text-align: left;
+      max-width: 400px;
+      margin: 0 auto 1em auto;
+      padding-left: 1.2em;
+    }
+    .order-id-box {
+      background: #23272f;
+      color: #00ffe7;
+      border-radius: 8px;
+      padding: 0.6em 1em;
+      margin: 0.7em auto 0.6em auto;
+      font-size: 1.1em;
+      display: inline-block;
+      font-family: monospace;
+      word-break: break-all;
+      letter-spacing: 0.5px;
+    }
+    .copy-btn {
+      background: #00ffe7;
+      color: #0d1117;
+      border: none;
+      border-radius: 5px;
+      padding: 0.3em 0.8em;
+      font-size: 0.97em;
+      margin-left: 0.5em;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .copy-btn:hover { background: #00c2ab; }
+    .contact-btn {
+      display: inline-block;
+      background: #00e3ca;
+      color: #0d1117;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      box-shadow: 0 0 8px #00e3ca;
+      transition: background-color 0.3s ease;
+      margin-top: 1rem;
+    }
+    .contact-btn:hover,
+    .contact-btn:focus {
+      background: #00b89e;
+      color: #fff;
+    }
+    @media (max-width: 600px) {
+      .checkout-box {
+        padding: 1rem;
+      }
+    }
+    .logo-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.2rem;
+  width: 100%;
+}
+
+.logo-img {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  border-radius: 16px;
+  box-shadow: 0 0 16px var(--accent-color);
+  background: #fff;
+  padding: 0.4rem;
+  margin-bottom: 0.3rem;
+}
+
+.brand-title {
+  text-align: center;
+  color: var(--accent-color);
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin: 0.2rem 0 0.1rem 0;
+  text-shadow: 0 0 10px var(--accent-color);
+  font-family: 'Poppins', sans-serif;
+  user-select: none;
+}
+
+.tagline {
+  text-align: center;
+  color: var(--accent-color);
+  font-size: 1.05rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+  font-family: 'Poppins', sans-serif;
+  user-select: none;
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+  .logo-img {
+    width: 48px;
+    height: 48px;
+  }
+  .brand-title {
+    font-size: 1.1rem;
+    letter-spacing: 1.2px;
+    margin: 0.13rem 0 0.13rem 0;
+  }
+  .tagline {
+    font-size: 0.92rem;
+    margin-bottom: 0.3rem;
+    letter-spacing: 0.3px;
+    padding: 0 0.2rem;
+  }
+}
+.order-for-choice {
+  display: flex;
+  gap: 1.5em;
+  margin-bottom: 1em;
+  align-items: center;
+  font-size: 1.05em;
+}
+
+  </style>
+</head>
+<body>
+  <div class="logo-stack">
+  <img src="images/logo.jpg" alt="Yantrakart Logo" class="logo-img" />
+  <div class="brand-title">YANTRAKART</div>
+  <div class="tagline">Smart Projects for Smart Students</div>
+</div>
+  <div class="checkout-box">
+    <h2>Checkout</h2>
+
+    <div id="product-info" class="product-info">
+      <p>Project Name: <strong id="productName"></strong></p>
+      <p>Description: <strong id="productDescription"></strong></p>
+      <p>Price: <strong id="productPrice"></strong></p>
+      <p class="total">Total: <strong id="totalPrice"></strong></p>
+      <div class="final-payment" id="finalPayment"></div>
+    </div>
+
+    <form id="checkout-form" novalidate>
+      <div class="order-for-choice">
+  <label><input type="radio" name="orderFor" value="self" checked /> For Myself</label>
+  <label><input type="radio" name="orderFor" value="other" /> For Someone Else</label>
+</div>
+
+      <label for="customerName">Your Name</label>
+      <input type="text" id="customerName" name="customerName" placeholder="Enter your full name" required />
+
+      <label for="customerPhone">Phone Number</label>
+      <input type="tel" id="customerPhone" name="customerPhone" placeholder="Enter your 10-digit phone number" pattern="^\d{10}$" required />
+
+      <label for="customerEmail">Email</label>
+<input type="text" id="customerEmail" name="customerEmail" placeholder="Enter your email" required />
+
+      <label for="referralCode">Referral Code (optional)</label>
+      <input type="text" id="referralCode" name="referralCode" placeholder="Enter referral code" maxlength="20" />
+      <div id="referrerName" class="referrer-name"></div>
+
+      <label for="couponCode">Coupon Code (optional)</label>
+      <input type="text" id="couponCode" name="couponCode" placeholder="Enter coupon code" maxlength="20" autocomplete="off" />
+      <div id="couponMessage" class="info-text"></div>
+
+      <button type="submit" id="checkout-button">Place Order</button>
+    </form>
+
+    <div id="errorMsg" class="error"></div>
+    <div id="successMsg" class="success"></div>
+    <a href="dashboard.html" class="nav-btn" id="goDashboard" style="display:none;">⬅️ Go to Dashboard</a>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp, query, where, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+   const firebaseConfig = {
+  apiKey: "AIzaSyCyjqvnrgCHt3SR4_kD3glRt55ImeXOxxA",
+  authDomain: "yantrakartcu.firebaseapp.com",
+  projectId: "yantrakartcu",
+  storageBucket: "yantrakartcu.firebasestorage.app",
+  messagingSenderId: "958180945232",
+  appId: "1:958180945232:web:18e049c7682da22b239055",
+  measurementId: "G-87FE485DTH"
+};
+   
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const productNameEl = document.getElementById('productName');
+    const productDescriptionEl = document.getElementById('productDescription');
+    const productPriceEl = document.getElementById('productPrice');
+    const totalPriceEl = document.getElementById('totalPrice');
+    const finalPaymentEl = document.getElementById('finalPayment');
+    const checkoutForm = document.getElementById('checkout-form');
+    const referralCodeInput = document.getElementById('referralCode');
+    const referrerNameEl = document.getElementById('referrerName');
+    const couponCodeInput = document.getElementById('couponCode');
+    const couponMessageEl = document.getElementById('couponMessage');
+    const errorMsg = document.getElementById('errorMsg');
+    const successMsg = document.getElementById('successMsg');
+    const goDashboardBtn = document.getElementById('goDashboard');
+
+    // Helper: get URL param
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    // Global for coupon discount
+    let couponDiscount = 0;
+    let couponDocId = null;
+    let projectPrice = 0;
+
+    // Load product details from URL or localStorage
+    function loadProductDetails() {
+      // Try to get from URL
+      let projectName = getQueryParam('title');
+      let projectDescription = getQueryParam('description');
+      let projectPriceRaw = getQueryParam('price');
+      
+
+      // Fallback to localStorage if not found
+      if (!projectName) projectName = localStorage.getItem('projectName') || 'Unknown Project';
+      if (!projectDescription) projectDescription = localStorage.getItem('projectDescription') || 'No description available.';
+      if (!projectPriceRaw) projectPriceRaw = localStorage.getItem('projectPrice') || '0';
+
+      // Save to localStorage for future use
+      localStorage.setItem('projectName', projectName);
+      localStorage.setItem('projectDescription', projectDescription);
+      localStorage.setItem('projectPrice', projectPriceRaw);
+
+      projectPrice = parseFloat(projectPriceRaw) || 0;
+      const formattedPrice = '₹' + projectPrice.toLocaleString('en-IN');
+
+      productNameEl.textContent = projectName;
+      productDescriptionEl.textContent = projectDescription;
+      productPriceEl.textContent = formattedPrice;
+      totalPriceEl.textContent = formattedPrice;
+
+      // Show initial final payment (before coupon)
+      updateFinalPayment();
+
+      return { projectName, projectDescription, projectPrice };
+    }
+
+    function updateFinalPayment() {
+      const finalAmount = Math.max(0, projectPrice - couponDiscount);
+      finalPaymentEl.innerHTML = `💸 Final Payment after discount: <span style="color:#43e97b;">₹${finalAmount.toLocaleString('en-IN')}</span>`;
+    }
+
+    // Validate referral code and show referrer username
+    referralCodeInput.addEventListener('input', async () => {
+      const code = referralCodeInput.value.trim();
+      referrerNameEl.textContent = '';
+      errorMsg.textContent = '';
+      if (code === '') return;
+
+      try {
+        const q = query(collection(db, "users"), where("referralCode", "==", code));
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.empty) {
+          referrerNameEl.textContent = '';
+          errorMsg.textContent = 'Referral code not found.';
+        } else {
+          errorMsg.textContent = '';
+          const userDoc = querySnapshot.docs[0];
+          const data = userDoc.data();
+          const displayName = data.displayName || 'User';
+          referrerNameEl.textContent = `Referral code belongs to: ${displayName}`;
+        }
+      } catch (err) {
+        errorMsg.textContent = 'Error validating referral code.';
+      }
+    });
+
+    // Validate coupon code and show discount info, update final payment instantly
+    couponCodeInput.addEventListener('input', async () => {
+      const code = couponCodeInput.value.trim();
+      couponMessageEl.textContent = '';
+      errorMsg.textContent = '';
+      couponDiscount = 0;
+      couponDocId = null;
+      if (code === '') {
+        updateFinalPayment();
+        return;
+      }
+
+      try {
+        const q = query(collection(db, "coupons"), where("code", "==", code), where("used", "==", false));
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.empty) {
+          couponMessageEl.textContent = '';
+          errorMsg.textContent = '❌ Invalid or used coupon code.';
+          updateFinalPayment();
+        } else {
+          errorMsg.textContent = '';
+          const couponDoc = querySnapshot.docs[0];
+          const data = couponDoc.data();
+          couponDiscount = data.discount || 0;
+          couponDocId = couponDoc.id;
+          couponMessageEl.textContent = `✅ Coupon valid! Discount: ₹${couponDiscount}`;
+          updateFinalPayment();
+        }
+      } catch (err) {
+        errorMsg.textContent = 'Error validating coupon code.';
+        updateFinalPayment();
+      }
+    });
+
+    // --- ORDER SUBMISSION WITH UNIQUE ORDER ID ---
+    checkoutForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorMsg.textContent = '';
+      successMsg.textContent = '';
+
+      const customerNameInput = checkoutForm.customerName.value.trim();
+      const customerPhone = checkoutForm.customerPhone.value.trim();
+      const customerEmail = customerEmailInput.value.trim();
+      const referralCode = referralCodeInput.value.trim();
+      const couponCode = couponCodeInput.value.trim();
+
+      if (!customerNameInput) {
+        errorMsg.textContent = "Please enter your name.";
+        return;
+      }
+      if (!customerEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) {
+    errorMsg.textContent = "Please enter a valid email address.";
+    return;
+  }
+  if (!customerPhone || !/^\d{10}$/.test(customerPhone)) {
+    errorMsg.textContent = "Please enter a valid 10-digit phone number.";
+    return;
+  }
+
+      // Use username from localStorage if available, else input
+      const storedUsername = localStorage.getItem('username');
+      const customerName = storedUsername || customerNameInput;
+
+      const { projectName, projectDescription } = loadProductDetails();
+      const finalAmount = Math.max(0, projectPrice - couponDiscount);
+
+      try {
+        // Save order to Firestore with status pending
+        const orderData = {
+          userId: auth.currentUser ? auth.currentUser.uid : null,
+          customerName,
+          customerPhone,
+          customerEmail,
+          referralCode: referralCode || null,
+          couponCode: couponCode || null,
+          discount: couponDiscount,
+          finalAmount,
+          projectName,
+          projectDescription,
+          projectPrice,
+          status: "pending",
+          paymentState: "pending",
+          createdAt: serverTimestamp(),
+        };
+
+        // Add order and get the document reference (to get the unique order ID)
+        const docRef = await addDoc(collection(db, "orders"), orderData);
+        const orderId = docRef.id; // Firestore’s unique order ID
+
+        // Update the order with its own orderId (for easier querying)
+        await updateDoc(docRef, { orderId });
+
+        // Mark coupon as used if applicable
+        if (couponDocId) {
+          await updateDoc(doc(db, "coupons", couponDocId), {
+            used: true,
+            usedAt: serverTimestamp(),
+          });
+        }
+
+        // Save orderId and price/status to localStorage for payment.html
+        localStorage.setItem("orderId", orderId);
+        localStorage.setItem("finalPrice", finalAmount);
+        localStorage.setItem("orderStatus", "approved"); // By default, set as "approved"
+        localStorage.setItem("paymentState", "pending");
+
+        // Show success message with order ID and copy button
+       successMsg.innerHTML = `
+  <span class="emoji-success">🎉</span>
+  <div class="success-notification">
+    <b>Order placed successfully!</b><br>
+    <div>
+      <span class="order-id-box" id="orderIdBox">${orderId}</span>
+      <button class="copy-btn" onclick="navigator.clipboard.writeText('${orderId}');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1200);">Copy</button>
+    </div>
+    <small>
+      <b>Important:</b> Please save your Order ID.<br>
+      <b>Payment instructions will be sent to you via notification after your order is approved by our team.</b>
+    </small>
+    <ul>
+      <li>Our team will review your order details.</li>
+      <li>Once approved, you will receive a notification in your dashboard with a secure payment link.</li>
+      <li><b>Do not make any payment until you receive the official payment link from Yantrakart.</b></li>
+      <li>You can always track your order status using your Order ID.</li>
+    </ul>
+    Thank you for choosing Yantrakart! 🚀<br><br>
+    <a href="contact.html" class="contact-btn">📞 Contact Us</a>
+  </div>
+`;
+
+        checkoutForm.style.display = "none";
+        goDashboardBtn.style.display = "block";
+        referrerNameEl.textContent = '';
+        couponMessageEl.textContent = '';
+      } catch (error) {
+        console.error("Error placing order:", error);
+        errorMsg.textContent = "Error placing order: " + error.message;
+      }
+    });
+const customerNameInput = document.getElementById('customerName');
+const customerPhoneInput = document.getElementById('customerPhone');
+const customerEmailInput = document.getElementById('customerEmail');
+
+function autofillUserDetails(user) {
+  let name = '', email = '', phone = '';
+  if (user) {
+    name = user.displayName || '';
+    email = user.email || '';
+    phone = user.phoneNumber ? user.phoneNumber.replace(/^\+91/, '') : '';
+  } else {
+    name = localStorage.getItem('username') || '';
+    email = localStorage.getItem('useremail') || '';
+    phone = localStorage.getItem('userphone') || '';
+  }
+  customerNameInput.value = name;
+  customerEmailInput.value = email;
+  customerPhoneInput.value = phone;
+}
+
+function setFieldsReadOnly(readonly) {
+  // Only lock if value is present, else keep editable
+  customerNameInput.readOnly = readonly && !!customerNameInput.value;
+  customerEmailInput.readOnly = readonly && !!customerEmailInput.value;
+  customerPhoneInput.readOnly = readonly && !!customerPhoneInput.value;
+
+  customerNameInput.style.background = (customerNameInput.readOnly ? "#22272e" : "");
+  customerEmailInput.style.background = (customerEmailInput.readOnly ? "#22272e" : "");
+  customerPhoneInput.style.background = (customerPhoneInput.readOnly ? "#22272e" : "");
+}
+
+
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+let currentUser = null;
+onAuthStateChanged(auth, (user) => {
+  currentUser = user;
+  autofillUserDetails(user);
+  setFieldsReadOnly(true);
+});
+
+document.querySelectorAll('input[name="orderFor"]').forEach(radio => {
+  radio.addEventListener('change', (e) => {
+    if (e.target.value === "self") {
+      autofillUserDetails(currentUser);
+      setFieldsReadOnly(true);
+    } else {
+      setFieldsReadOnly(false);
+    }
+  });
+});
+    // Initialize product info on page load
+    loadProductDetails();
+  </script>
+</body>
+</html>

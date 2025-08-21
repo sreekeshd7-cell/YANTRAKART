@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Contact Us | Yantrakart</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: #0d1117;
+      color: #c9d1d9;
+      padding: 2rem;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.8rem;
+      color: #00ffe7;
+      margin-bottom: 2rem;
+      padding: 0.5rem 1rem;
+      background: rgba(0, 255, 231, 0.1);
+      border: 2px solid #00ffe7;
+      border-radius: 15px;
+      text-shadow: 0 0 12px #00ffe7;
+    }
+
+    .contact-container {
+      max-width: 700px;
+      margin: 0 auto;
+      background: #161b22;
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(121, 255, 225, 0.6);
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+
+    .info a {
+      color: #00ffe7;
+      text-decoration: none;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    input, textarea {
+      padding: 0.8rem 1rem;
+      border: 2px solid #00ffe7;
+      border-radius: 10px;
+      background-color: #0d1117;
+      color: #c9d1d9;
+      font-size: 1rem;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #4fffe1;
+      box-shadow: 0 0 8px #4fffe1;
+    }
+
+    button {
+      background: #00e3ca;
+      color: #0d1117;
+      padding: 0.7rem;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 0 12px #00e3ca;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #00b89e;
+    }
+     .logo-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1.2rem;
+}
+.logo {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  border-radius: 16px;
+  box-shadow: 0 0 16px #00ffe7;
+  background: #fff;
+  padding: 0.4rem;
+}
+
+    .info {
+      margin-top: 2rem;
+      font-size: 1.05rem;
+      line-height: 1.6;
+    }
+
+    .info span {
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .map {
+      margin-top: 2rem;
+      width: 100%;
+      height: 300px;
+      border: none;
+      border-radius: 12px;
+    }
+
+    .whatsapp-button {
+      margin-top: 2rem;
+      display: inline-block;
+      padding: 0.8rem 2rem;
+      background-color: #25d366;
+      color: white;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border-radius: 30px;
+      text-decoration: none;
+      text-align: center;
+      box-shadow: 0 0 12px rgba(37, 211, 102, 0.8);
+    }
+
+    .whatsapp-button:hover {
+      background-color: #1ebe57;
+    }
+
+    /* Theme Toggle */
+    .switch {
+      position: fixed;
+      top: 15px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .switch input {
+      display: none;
+    }
+
+    .slider {
+      width: 50px;
+      height: 26px;
+      background-color: #ccc;
+      border-radius: 34px;
+      position: relative;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      border-radius: 50%;
+      transition: transform 0.3s;
+    }
+
+    input:checked + .slider {
+      background-color: #00e3ca;
+    }
+
+    input:checked + .slider::before {
+      transform: translateX(24px);
+    }
+
+    /* Light Mode */
+    body.light-mode {
+      background: #f0f0f0;
+      color: #111;
+    }
+
+    body.light-mode .contact-container {
+      background: #ffffff;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+    }
+
+    body.light-mode input,
+    body.light-mode textarea {
+      background-color: #ffffff;
+      color: #000;
+      border: 2px solid #00796b;
+    }
+
+    body.light-mode .info a {
+      color: #00796b;
+      font-weight: 600;
+    }
+
+    body.light-mode h1 {
+      color: #00796b;
+      border-color: #00796b;
+      text-shadow: none;
+      background: rgba(0, 121, 107, 0.1);
+    }
+    .logo-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.2rem;
+  width: 100%;
+}
+
+.brand-title {
+  text-align: center;
+  color: #00ffe7;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin: 0.2rem 0 0.1rem 0;
+  text-shadow: 0 0 10px #00ffe7;
+  font-family: 'Poppins', sans-serif;
+  user-select: none;
+}
+
+.tagline {
+  text-align: center;
+  color: #00ffe7;
+  font-size: 1.08rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  margin: 0 0 0.5rem 0;
+  font-family: 'Poppins', sans-serif;
+  user-select: none;
+}
+
+/* Light mode support */
+body.light-mode .brand-title,
+body.light-mode .tagline {
+  color: #00796b;
+  text-shadow: none;
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+  .logo-stack .logo {
+    width: 54px;
+    height: 54px;
+  }
+  .brand-title {
+    font-size: 1.1rem;
+    letter-spacing: 1.2px;
+    margin: 0.13rem 0 0.13rem 0;
+  }
+  .tagline {
+    font-size: 0.97rem;
+    margin-bottom: 0.3rem;
+    letter-spacing: 0.3px;
+    padding: 0 0.2rem;
+  }
+}
+
+  </style>
+</head>
+<body>
+   <!-- Logo Section -->
+<div class="logo-stack">
+  <a href="index.html" class="logo-link">
+    <img src="images/logo.jpg" alt="Yantrakart Logo" class="logo" />
+  </a>
+  <div class="brand-title">YANTRAKART</div>
+  <div class="tagline">Smart Projects for Smart Students</div>
+</div>
+
+
+
+  <!-- Theme Toggle -->
+  <label class="switch">
+    <input type="checkbox" id="modeToggle">
+    <span class="slider"></span>
+  </label>
+
+  <h1>📬 Contact Yantrakart</h1>
+
+  <div class="contact-container">
+    <form id="contactForm">
+      <input type="text" id="name" placeholder="Your Name" required>
+      <input type="email" id="email" placeholder="Your Email" required>
+      <input type="tel" id="phone" placeholder="Your Phone Number" required>
+      <textarea id="message" rows="4" placeholder="Your Message" required></textarea>
+      <button type="submit">Send Message</button>
+    </form>
+
+    <div class="info">
+      <span>📍 <strong>Address:</strong> Chandigarh University Campus, Gharuan - 140301</span>
+      <span>📞 <strong>Phone:</strong> <a href="tel:+91 91505 03296">+91 91505 03296</a></span>
+      <span>📧 <strong>Email:</strong> <a href="mailto:sreekeshd7@gmail.com">sreekeshd7@gmail.com</a></span>
+    </div>
+
+    <iframe class="map"
+      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3431.145313411528!2d76.57856761439706!3d30.76857028161807!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390fed61f29faebf%3A0x3f9e2d0bb58c63f1!2sChandigarh%20University!5e0!3m2!1sen!2sin!4v1652863067319!5m2!1sen!2sin"
+      allowfullscreen="" loading="lazy"></iframe>
+
+    <a href="https://wa.me/918708083952" class="whatsapp-button" target="_blank">Contact on WhatsApp 💬</a>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const modeToggle = document.getElementById("modeToggle");
+    modeToggle.addEventListener("change", () => {
+      document.body.classList.toggle("light-mode");
+    });
+const firebaseConfig = {
+  apiKey: "AIzaSyCyjqvnrgCHt3SR4_kD3glRt55ImeXOxxA",
+  authDomain: "yantrakartcu.firebaseapp.com",
+  projectId: "yantrakartcu",
+  storageBucket: "yantrakartcu.firebasestorage.app",
+  messagingSenderId: "958180945232",
+  appId: "1:958180945232:web:18e049c7682da22b239055",
+  measurementId: "G-87FE485DTH"
+};
+   
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const contactForm = document.getElementById("contactForm");
+    contactForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const message = document.getElementById("message").value.trim();
+
+      if (!name || !email || !phone || !message) {
+        alert("Please fill all fields.");
+        return;
+      }
+
+      try {
+        await addDoc(collection(db, "contact form Messages"), {
+          name,
+          email,
+          phone,
+          message,
+          createdAt: serverTimestamp()
+        });
+
+        alert("✅ Message sent successfully!");
+        contactForm.reset();
+      } catch (error) {
+        console.error("Error sending message: ", error);
+        alert("❌ Something went wrong. Please try again.");
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en-US" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Yantrakart Project Store</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+    * { box-sizing: border-box; }
+    :root {
+      --accent: #00ffe7;
+      --accent-dark: #00796b;
+      --bg-light: #f7fafb;
+      --bg-dark: #0d1117;
+      --card-light: rgba(255,255,255,0.97);
+      --card-dark: #161b22;
+      --text-light: #1a1a1a;
+      --text-dark: #c9d1d9;
+      --shadow-light: 0 2px 16px rgba(0,0,0,0.10);
+      --shadow-dark: 0 0 20px rgba(121,255,225,0.6);
+      --button-bg-light: #009688;
+      --button-bg-dark: #00e3ca;
+      --button-hover-light: #00796b;
+      --button-hover-dark: #00b89e;
+      --whatsapp: #25d366;
+      --whatsapp-hover: #1ebe57;
+      --error: #d32f2f;
+      --success: #388e3c;
+    }
+    html[data-theme="light"] {
+      --bg: var(--bg-light);
+      --card: var(--card-light);
+      --text: var(--text-light);
+      --shadow: var(--shadow-light);
+      --accent-main: var(--accent-dark);
+      --button-bg: var(--button-bg-light);
+      --button-hover: var(--button-hover-light);
+    }
+    html[data-theme="dark"] {
+      --bg: var(--bg-dark);
+      --card: var(--card-dark);
+      --text: var(--text-dark);
+      --shadow: var(--shadow-dark);
+      --accent-main: var(--accent);
+      --button-bg: var(--button-bg-dark);
+      --button-hover: var(--button-hover-dark);
+    }
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 2rem 0 3rem 0;
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+    header {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto 2rem auto;
+      background: var(--card);
+      color: var(--accent-main);
+      border-radius: 0 0 15px 15px;
+      box-shadow: 0 4px 24px var(--accent-main);
+      padding: 1.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 2;
+      z-index: 1000;
+    }
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .logo {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      border-radius: 16px;
+      box-shadow: 0 0 16px var(--accent-main);
+      background: #fff;
+      padding: 0.4rem;
+    }
+    h1 {
+      font-size: 5.1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent-main);
+      text-shadow: none;
+      margin-bottom: 2;
+      background: rgba(0,0,0,0.02);
+      padding: 0.5rem 1rem;
+      transition: color 0.3s, border-color 0.3s, background 0.3s;
+    }
+    nav {
+      display: flex;
+      gap: 1.2rem;
+    }
+    nav button, nav a.button-link {
+      background: var(--button-bg);
+      color: #fff;
+      border: none;
+      padding: 0.8rem 1.6rem;
+      border-radius: 25px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 0 8px var(--accent-main);
+      transition: background 0.3s, color 0.3s, box-shadow 0.3s, transform 0.2s;
+      user-select: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      outline: none;
+    }
+    nav button:hover, nav a.button-link:hover, nav button:focus, nav a.button-link:focus {
+      background: var(--button-hover);
+      color: #fff;
+      box-shadow: 0 0 16px var(--accent-main);
+      transform: scale(1.07) rotate(-1deg);
+    }
+    #userWelcome {
+      margin: 1rem auto 2rem auto;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--accent-main);
+      text-align: center;
+      user-select: none;
+    }
+    #userWelcome button {
+      margin-top: 1rem;
+      background-color: var(--accent-main);
+      color: var(--bg);
+      border: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 20px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    #userWelcome button:hover { background-color: #00c2ab; }
+    .whatsapp-floating-button {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: var(--whatsapp);
+      color: #fff;
+      font-weight: bold;
+      font-size: 1.3rem;
+      padding: 15px 22px;
+      border-radius: 50px;
+      box-shadow: 0 0 24px var(--whatsapp), 0 0 6px var(--accent-main);
+      text-decoration: none;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+      animation: pulseWhatsapp 2.5s infinite alternate;
+    }
+    .whatsapp-floating-button:hover {
+      background: var(--whatsapp-hover);
+      transform: scale(1.1);
+      box-shadow: 0 0 32px var(--whatsapp), 0 0 12px var(--accent-main);
+    }
+    @keyframes pulseWhatsapp {
+      0% { box-shadow: 0 0 10px var(--whatsapp), 0 0 2px var(--accent-main);}
+      100% { box-shadow: 0 0 24px var(--whatsapp), 0 0 6px var(--accent-main);}
+    }
+    main {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+      padding-bottom: 3rem;
+    }
+    .store-info, .delivery-process, .sell-panel, .feedback {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 2rem 2.5rem;
+      box-shadow: var(--shadow);
+      color: var(--text);
+      line-height: 1.5;
+      margin-bottom: 2rem;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    .store-info h2,
+    .delivery-process h2,
+    .sell-panel h2,
+    .feedback h2 {
+      font-weight: 700;
+      color: var(--accent-main);
+      margin-bottom: 1rem;
+      text-align: center;
+      font-size: 2rem;
+      text-shadow: none;
+    }
+    .store-info ul {
+      padding-left: 1.4rem;
+      list-style-type: disc;
+      font-weight: 600;
+      color: var(--accent-main);
+    }
+    .info-cards {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 2.5rem 0;
+    }
+    .info-card {
+      background: var(--card);
+      border-radius: 18px;
+      box-shadow: 0 0 16px var(--accent-main);
+      padding: 2rem 2rem 1.5rem 2rem;
+      flex: 1 1 300px;
+      max-width: 400px;
+      min-width: 260px;
+      color: var(--text);
+      transition: transform 0.25s, box-shadow 0.2s, background 0.3s, color 0.3s;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      text-decoration: none;
+    }
+    .info-card:hover,
+    .info-card:focus {
+      transform: translateY(-8px) scale(1.04);
+      box-shadow: 0 0 32px var(--accent-main);
+      background: rgba(0,150,136,0.08);
+      color: var(--accent-main);
+      outline: none;
+    }
+    .info-card h3 {
+      margin-top: 0;
+      font-weight: 700;
+      margin-bottom: 0.7rem;
+      font-size: 1.35rem;
+      color: var(--accent-main);
+      text-shadow: none;
+    }
+    .info-card p {
+      font-size: 1.05rem;
+      line-height: 1.4;
+      color: var(--text);
+      margin: 0 0 0.2rem 0;
+    }
+    @media (max-width: 800px) {
+      .info-cards {
+        flex-direction: column;
+        gap: 1.2rem;
+        align-items: stretch;
+      }
+      .info-card {
+        max-width: 98vw;
+        margin: 0 auto;
+      }
+    }
+    .sell-panel form, .feedback form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .sell-panel label, .feedback label {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 0.3rem;
+      color: var(--accent-main);
+      text-shadow: none;
+    }
+    .sell-panel input,
+    .sell-panel select,
+    .sell-panel textarea,
+    .feedback input,
+    .feedback textarea {
+      padding: 0.8rem 1rem;
+      border: 2px solid var(--accent-main);
+      border-radius: 10px;
+      background-color: var(--card);
+      color: var(--text);
+      font-size: 1rem;
+      font-family: inherit;
+      transition: background 0.3s, color 0.3s, border-color 0.3s;
+      box-shadow: 0 0 6px var(--accent-main);
+    }
+    .sell-panel input:focus,
+    .sell-panel select:focus,
+    .sell-panel textarea:focus,
+    .feedback input:focus,
+    .feedback textarea:focus {
+      outline: none;
+      border-color: #26c6da;
+      box-shadow: 0 0 8px #26c6da;
+    }
+    .sell-panel button[type="submit"], .feedback button[type="submit"] {
+      background: var(--button-bg);
+      color: #fff;
+      font-weight: 700;
+      padding: 0.8rem 2rem;
+      border-radius: 25px;
+      border: none;
+      font-size: 1.1rem;
+      cursor: pointer;
+      box-shadow: 0 0 10px var(--accent-main);
+      transition: background 0.3s, box-shadow 0.3s, transform 0.2s, color 0.3s;
+      user-select: none;
+    }
+    .sell-panel button[type="submit"]:hover, .feedback button[type="submit"]:hover {
+      background: var(--button-hover);
+      color: #fff;
+      box-shadow: 0 0 20px var(--accent-main);
+      transform: scale(1.05);
+    }
+    #sellFormMessage {
+      margin-top: 1rem;
+      font-weight: 600;
+      text-align: center;
+      color: var(--accent-main);
+      text-shadow: none;
+    }
+    /* Improved Feedback Section */
+    .feedback-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: center;
+      padding: 2rem 0 0 0;
+      margin: 0 auto;
+      max-width: 900px;
+    }
+    .feedback-card {
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: 0 4px 18px var(--accent-main);
+      color: var(--text);
+      padding: 1.4rem 2rem 1.2rem 2rem;
+      margin-bottom: 0.5rem;
+      min-width: 260px;
+      max-width: 340px;
+      flex: 1 1 320px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      transition: box-shadow 0.2s, background 0.2s;
+      word-break: break-word;
+    }
+    .feedback-card:hover {
+      background: rgba(0,150,136,0.10);
+      box-shadow: 0 0 28px var(--accent-main);
+    }
+    .feedback-name {
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: var(--accent-main);
+      margin-bottom: 0.2rem;
+      text-shadow: none;
+    }
+    .feedback-institution {
+      font-size: 0.95rem;
+      font-style: italic;
+      color: #73d3d7;
+      margin-bottom: 0.5rem;
+    }
+    .feedback-message {
+      font-size: 1.05rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      margin-top: 0.25rem;
+    }
+    @media (max-width: 900px) {
+      .feedback-list {
+        flex-direction: column;
+        gap: 1.2rem;
+        align-items: center;
+      }
+      .feedback-card {
+        max-width: 98vw;
+        min-width: 0;
+      }
+    }
+    a, a:visited {
+      color: var(--accent-main);
+      text-decoration: underline;
+    }
+    a:hover, a:focus {
+      color: var(--accent);
+      text-decoration: underline;
+    }
+    .error, .success {
+      color: var(--error);
+      background: #fff0f0;
+      border-radius: 6px;
+      padding: 0.4em 1em;
+      margin-bottom: 1em;
+      font-weight: 600;
+      text-shadow: none;
+    }
+    .success {
+      color: var(--success);
+      background: #e6fbe7;
+    }
+    footer {
+      margin-top: 3rem;
+      color: var(--accent-main);
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-align: center;
+      user-select: none;
+    }
+    #welcomeOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(13, 17, 23, 0.96);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      flex-direction: column;
+      color: var(--accent-main);
+      font-size: 2.5rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      user-select: none;
+      opacity: 0;
+      animation: fadeInOut 2.5s ease-in-out forwards;
+    }
+    @keyframes fadeInOut {
+      0% { opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { opacity: 0; visibility: hidden; }
+    }
+    #welcomeOverlay .welcome-icon {
+      font-size: 3.5rem;
+      margin-bottom: 1rem;
+      animation: pulse 1.5s infinite alternate;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.13); }
+    }
+    @media (max-width: 600px) {
+  header {
+    flex-direction: column;
+    padding: 1rem 0.5rem;
+    text-align: center;
+  }
+  .logo {
+    width: 55px;
+    height: 55px;
+  }
+  h1 {
+    font-size: 2rem;
+    padding: 0.3rem 0.5rem;
+  }
+  nav {
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+  main {
+    padding: 0 0.2rem;
+  }
+  .store-info, .delivery-process, .sell-panel, .feedback {
+    padding: 1rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.98rem;
+  }
+  .info-card {
+    max-width: 100vw;
+    min-width: 0;
+    padding: 1.2rem 0.5rem;
+    font-size: 0.97rem;
+  }
+  .feedback-card {
+    max-width: 100vw;
+    min-width: 0;
+    padding: 1rem 0.5rem;
+    font-size: 0.97rem;
+  }
+  .whatsapp-floating-button {
+    bottom: 15px;
+    right: 15px;
+    padding: 12px 16px;
+    font-size: 1rem;
+  }
+  .sell-panel form, .feedback form {
+    padding: 0 0.1rem;
+  }
+}
+.logo-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.brand-title {
+  text-align: center;
+  color: var(--accent-main);
+  font-size: 2.2rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin: 0.2rem 0 0.1rem 0;
+  text-shadow: 0 0 10px var(--accent-main);
+  font-family: 'Poppins', sans-serif;
+  user-select: none;
+}
+
+.tagline {
+  text-align: center;
+  color: var(--accent-main);
+  font-size: 1.08rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  margin: 0 0 0.5rem 0;
+  font-family: 'Poppins', sans-serif;
+  user-select: none;
+}
+
+html[data-theme='dark'] .brand-title,
+html[data-theme='dark'] .tagline {
+  color: var(--accent);
+  text-shadow: 0 0 10px var(--accent);
+}
+html[data-theme='light'] .brand-title,
+html[data-theme='light'] .tagline {
+  color: var(--accent-dark);
+  text-shadow: none;
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+  .logo-stack .logo {
+    width: 48px;
+    height: 48px;
+  }
+  .brand-title {
+    font-size: 1.1rem;
+    letter-spacing: 1.2px;
+    margin: 0.13rem 0 0.13rem 0;
+  }
+  .tagline {
+    font-size: 0.97rem;
+    margin-bottom: 0.3rem;
+    letter-spacing: 0.3px;
+    padding: 0 0.2rem;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <div id="welcomeOverlay" aria-hidden="true" style="display:none;">
+    <div class="welcome-icon">✨</div>
+    <div>Welcome to Yantrakart!</div>
+  </div>
+  <header>
+    <div class="logo-container">
+  <div class="logo-stack">
+    <img src="images/logo.jpg" alt="Yantrakart Logo" class="logo" />
+    <div class="brand-title">YANTRAKART</div>
+    <div class="tagline">Smart Projects for Smart Students</div>
+  </div>
+</div>
+
+    <nav>
+      <button id="loginBtn" aria-label="Login" style="display:none;">Login</button>
+      <button id="dashboardBtn" aria-label="User Dashboard" style="display:none;">User Dashboard</button>
+      <button onclick="window.location.href='contact.html'" aria-label="Contact Us">Contact Us 📞</button>
+      <button id="themeToggle" aria-label="Toggle Theme">🌓 Toggle Theme</button>
+    </nav>
+  </header>
+  <div id="userWelcome" style="display:none;"></div>
+  <main>
+    <section class="store-info" aria-labelledby="about-title">
+      <h2 id="about-title">🧭 About Yantrakart</h2>
+      <p>Welcome to Yantrakart! 🚀 We are a student-led startup at Chandigarh University, committed to providing affordable and practical IoT, CAD, and software-based projects tailored for first-year engineering students. Recognizing that many students in their initial year lack hands-on experience and time to delve into complex projects, Yantrakart offers ready-to-use solutions that bridge the gap between theoretical knowledge and practical application.</p>
+      <h3>💡 Our Offerings</h3>
+      <ul>
+        <li>🔌 <strong>IoT Projects:</strong> Smart home automation, environmental monitoring, and more.</li>
+        <li>🖥️ <strong>CAD Projects:</strong> SolidWorks, AutoCAD models, and mechanical design projects.</li>
+        <li>💻 <strong>Software Projects:</strong> Desktop and web-based tools for engineering students.</li>
+      </ul>
+      <h3>🎯 Why Choose Yantrakart?</h3>
+      <ul>
+        <li>💸 <strong>Affordable Pricing:</strong> Competitive prices for all students.</li>
+        <li>🤝 <strong>Student-Centric Approach:</strong> Built by students, for students.</li>
+        <li>📚 <strong>Comprehensive Support:</strong> We help you implement and understand your project.</li>
+      </ul>
+      <h3>🌟 Join Us in Shaping the Future</h3>
+      <p>Empowering students to innovate and excel. Explore our offerings and start your hands-on learning journey with Yantrakart today!</p>
+    </section>
+    <section class="info-cards" aria-label="Explore product categories">
+      <a href="iot.html" class="info-card" id="iotCard" data-requires-auth="true" role="button" tabindex="0" aria-label="Explore IoT Projects">
+        <h3>IoT Projects</h3>
+        <p>🌐🤖 Explore a wide range of innovative IoT projects to enhance your learning and practical skills. From smart home automation to health monitoring and smart agriculture, get hands-on experience with real-world technology! 🚀🔌.</p>
+      </a>
+      <a href="components.html" class="info-card" id="componentsCard" data-requires-auth="true" role="button" tabindex="0" aria-label="Explore Components">
+  <h3>Components</h3>
+  <p>🔩🧰 Browse a curated selection of electronic and mechanical components essential for building your IoT and engineering projects. Sourced for students, priced for accessibility!</p>
+</a>
+
+      <a href="software.html" class="info-card" id="cadCard" data-requires-auth="true" role="button" tabindex="0" aria-label="Explore CAD and Software Projects">
+        <h3>CAD &amp; Software Projects</h3>
+        <p>💻🛠️📐 Explore ready-to-use software tools and professional CAD models designed for engineering students. Boost your learning with easy-to-understand projects, customizable solutions, and expert support. Perfect for assignments and presentations! 🚀✨.</p>
+      </a>
+    </section>
+    <!-- Auth message container -->
+    <div id="authMessage" style="display:none; text-align:center; color:#d32f2f; font-weight:600; margin-bottom:1rem;"></div>
+    <section class="delivery-process" aria-labelledby="order-guide-title">
+      <h2 id="order-guide-title">How to Order 🛍️</h2>
+      <ol>
+        <li><strong>Login</strong> to your account to browse available projects.</li>
+        <li>Select your desired items and click <strong>“Buy Now”</strong>.</li>
+        <li>You will be redirected to the <strong>Checkout page</strong> to place your order.</li>
+        <li>Our team will review your order after submission.</li>
+        <li>If verified, you’ll receive a <strong>notification with a 50% payment link</strong>.</li>
+        <li>Pay 50% to confirm your order. The rest is due at delivery.</li>
+      </ol>
+      <p><em>Note: Please login to browse and order projects.</em></p>
+    </section>
+    <section class="delivery-process" aria-labelledby="delivery-title">
+      <h2 id="delivery-title">Delivery Process 🚚</h2>
+      <p>To confirm your order, a <strong>50% advance payment</strong> is required after order verification. The remaining 50% can be paid at the time of delivery.</p>
+      <p>Delivery is mainly done <strong>within Chandigarh University campus</strong> by our student team.</p>
+      <p>For delivery outside the campus, additional delivery charges may apply.</p>
+      <p>We strive to provide a smooth and hassle-free delivery experience for our fellow students! 🎓✨</p>
+    </section>
+    <section class="sell-panel" aria-labelledby="sell-panel-title">
+      <h2 id="sell-panel-title">🛒 Sell Your IoT Projects & Components</h2>
+      <p>Have an IoT project or component to sell? Submit your details and connect with our student community! 🚀</p>
+      <form id="sellForm" aria-label="Form to submit IoT projects/components" enctype="multipart/form-data">
+        <label for="sellerName">👤 Your Name *</label>
+        <input type="text" id="sellerName" name="sellerName" required placeholder="Enter your full name" />
+        <label for="sellerEmail">📧 Email *</label>
+        <input type="email" id="sellerEmail" name="sellerEmail" required placeholder="Enter your email address" />
+        <label for="itemName">📦 Project/Component Name *</label>
+        <input type="text" id="itemName" name="itemName" required placeholder="Name of the IoT project or component" />
+        <label for="category">📂 Category *</label>
+        <select id="category" name="category" required>
+          <option value="" disabled selected>Select category</option>
+          <option value="IoT Project">IoT Project</option>
+          <option value="IoT Component">IoT Component</option>
+        </select>
+        <label for="description">📝 Description *</label>
+        <textarea id="description" name="description" rows="4" required placeholder="Describe your project/component"></textarea>
+        <label for="price">💰 Price (INR) *</label>
+        <input type="number" id="price" name="price" required min="0" placeholder="Enter price in INR" />
+        <label for="contactNumber">📞 Contact Number *</label>
+        <input type="tel" id="contactNumber" name="contactNumber" required pattern="(\+91)?\d{10}" placeholder="10-digit phone number, optionally with +91" />
+        <label for="itemImage">🖼️ Upload Image (optional)</label>
+        <input type="file" id="itemImage" name="itemImage" accept="image/*" />
+        <button type="submit">Submit Item</button>
+      </form>
+      <div id="sellFormMessage" aria-live="polite" role="alert" style="margin-top:1rem; font-weight:600; text-align:center;"></div>
+    </section>
+    <section class="feedback" aria-labelledby="feedback-title">
+      <h2 id="feedback-title">What Our Customers Say</h2>
+      <form id="feedbackForm" aria-label="Submit your feedback">
+        <input id="name" name="name" type="text" placeholder="Your Name" required autocomplete="name" />
+        <input id="phone" name="phone" type="tel" placeholder="Your Phone Number (10 digits)" pattern="\d{10}" required autocomplete="tel" />
+        <textarea id="message" name="message" rows="4" placeholder="Your Feedback" required></textarea>
+        <button type="submit">Submit Feedback</button>
+      </form>
+      <div id="feedbackList" class="feedback-list" aria-live="polite"></div>
+    </section>
+  </main>
+  <footer>
+    &copy; 2025 Yantrakart | Made with ❤️ by Chandigarh University Students
+  </footer>
+  <a href="https://wa.me/918708083952" target="_blank" class="whatsapp-floating-button" aria-label="Chat on WhatsApp">💬 WhatsApp</a>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, addDoc, query, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    // Welcome animation: only show on first visit per session
+    const overlay = document.getElementById('welcomeOverlay');
+    if (!sessionStorage.getItem('yantrakart_welcome_shown')) {
+      overlay.style.display = 'flex';
+      setTimeout(() => {
+        overlay.style.opacity = '0';
+        setTimeout(() => overlay.style.display = 'none', 500);
+      }, 2000); // 2 seconds
+      sessionStorage.setItem('yantrakart_welcome_shown', 'yes');
+    }
+    const firebaseConfig = {
+  apiKey: "AIzaSyCyjqvnrgCHt3SR4_kD3glRt55ImeXOxxA",
+  authDomain: "yantrakartcu.firebaseapp.com",
+  projectId: "yantrakartcu",
+  storageBucket: "yantrakartcu.firebasestorage.app",
+  messagingSenderId: "958180945232",
+  appId: "1:958180945232:web:18e049c7682da22b239055",
+  measurementId: "G-87FE485DTH"
+};
+   
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+    const auth = getAuth(app);
+
+    function escapeHTML(str) {
+      if (!str) return "";
+      return str.replace(/[&<>"']/g, m => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[m]));
+    }
+    // Feedback
+    async function loadApprovedFeedback() {
+      const feedbackRef = collection(db, "feedbacks");
+      const q = query(feedbackRef, where("status", "==", "approved"));
+      const snapshot = await getDocs(q);
+      const feedbackList = document.getElementById("feedbackList");
+      feedbackList.innerHTML = "";
+      if (snapshot.empty) {
+        feedbackList.innerHTML = "<p>No feedback available yet.</p>";
+        return;
+      }
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        const card = document.createElement("div");
+        card.className = "feedback-card";
+        card.innerHTML = `
+          <div class="feedback-name">${escapeHTML(data.name || "Anonymous")}</div>
+          <div class="feedback-institution">Chandigarh University</div>
+          <div class="feedback-message">${escapeHTML(data.feedback || data.message || "")}</div>
+        `;
+        feedbackList.appendChild(card);
+      });
+    }
+    document.getElementById("feedbackForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      const name = e.target.name.value.trim();
+      const phone = e.target.phone.value.trim();
+      const message = e.target.message.value.trim();
+      if (!name || !phone || !message) {
+        alert("Please fill in all required fields.");
+        return;
+      }
+      if (!/^\d{10}$/.test(phone)) {
+        alert("Please enter a valid 10-digit phone number.");
+        return;
+      }
+      try {
+        await addDoc(collection(db, "feedbacks"), {
+          name,
+          phone,
+          feedback: message,
+          status: "pending",
+          createdAt: serverTimestamp(),
+        });
+        alert("Thank you! Your feedback has been submitted and is pending approval.");
+        e.target.reset();
+        loadApprovedFeedback();
+      } catch (error) {
+        alert("Error submitting feedback. Please try again later.");
+      }
+    });
+    loadApprovedFeedback();
+    // Sell Panel
+    const sellForm = document.getElementById("sellForm");
+    const sellFormMessage = document.getElementById("sellFormMessage");
+
+    sellForm.addEventListener("submit", async e => {
+      e.preventDefault();
+      sellFormMessage.style.color = "var(--accent)";
+      sellFormMessage.textContent = "⏳ Submitting your item, please wait...";
+      const formData = new FormData(sellForm);
+      try {
+        let imageUrl = "";
+        const file = formData.get("itemImage");
+        if (file && file.size > 0) {
+          const imageRef = ref(storage, `sellItems/${Date.now()}_${file.name}`);
+          await uploadBytes(imageRef, file);
+          imageUrl = await getDownloadURL(imageRef);
+        }
+        await addDoc(collection(db, "sellItems"), {
+          sellerName: formData.get("sellerName"),
+          sellerEmail: formData.get("sellerEmail"),
+          itemName: formData.get("itemName"),
+          category: formData.get("category"),
+          description: formData.get("description"),
+          price: Number(formData.get("price")),
+          contactNumber: formData.get("contactNumber"),
+          imageUrl,
+          status: "pending",
+          createdAt: serverTimestamp(),
+        });
+        sellFormMessage.style.color = "var(--success)";
+        sellFormMessage.innerHTML = "🎉 Thank you for your submission! Our team will contact you shortly. 📞🤝";
+        sellForm.reset();
+        setTimeout(() => {
+          sellFormMessage.textContent = "";
+        }, 6000);
+      } catch (error) {
+        sellFormMessage.style.color = "var(--error)";
+        sellFormMessage.textContent = "❌ Error submitting your item. Please try again later.";
+      }
+    });
+
+    // Auth & Navigation UI
+    const loginBtn = document.getElementById("loginBtn");
+    const dashboardBtn = document.getElementById("dashboardBtn");
+    const userWelcome = document.getElementById("userWelcome");
+
+    loginBtn.style.display = "inline-block";
+    dashboardBtn.style.display = "inline-block";
+
+    onAuthStateChanged(auth, user => {
+      if (user) localStorage.removeItem("guest");
+      if (user && !localStorage.getItem("guest")) {
+        const displayName = user.displayName?.trim() || "User";
+        userWelcome.innerHTML = `
+          Welcome back, <strong>${escapeHTML(displayName)}</strong>! Glad to see you again.<br/>
+        `;
+        userWelcome.style.display = "block";
+        loginBtn.style.display = "none";
+        dashboardBtn.style.display = "inline-block";
+        // Hide auth message if any
+        document.getElementById("authMessage").style.display = "none";
+      } else {
+        userWelcome.innerHTML = `
+          Welcome! Please <button id="loginRedirectBtn" aria-label="Login">Login</button> to access your dashboard.
+        `;
+        userWelcome.style.display = "block";
+        loginBtn.style.display = "inline-block";
+        dashboardBtn.style.display = "none";
+        document.getElementById("loginRedirectBtn").onclick = () => {
+          window.location.href = "/login.html";
+        };
+      }
+    });
+    loginBtn.onclick = () => window.location.href = "/login.html";
+    dashboardBtn.onclick = () => window.location.href = "/dashboard.html";
+    // Theme toggle logic
+    const themeToggle = document.getElementById("themeToggle");
+    const currentTheme = localStorage.getItem("theme") || "light";
+    document.documentElement.setAttribute("data-theme", currentTheme);
+    themeToggle.textContent = currentTheme === "dark" ? "🌞 Light Mode" : "🌙 Dark Mode";
+    themeToggle.addEventListener("click", () => {
+      const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+      const newTheme = isDark ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", newTheme);
+      localStorage.setItem("theme", newTheme);
+      themeToggle.textContent = newTheme === "dark" ? "🌞 Light Mode" : "🌙 Dark Mode";
+    });
+
+    // --- Auth-gated cards logic (normal look, message on click for guests) ---
+    const iotCard = document.getElementById("iotCard");
+    const cadCard = document.getElementById("cadCard");
+    const authMessage = document.getElementById("authMessage");
+const componentsCard = document.getElementById("componentsCard");
+componentsCard.addEventListener("click", cardClickHandler);
+
+    let isUserLoggedIn = false;
+
+    function showAuthMessage() {
+      authMessage.innerHTML = `
+        🔒 Please log in to access IoT or CAD & Software Projects or buy any Component.
+        <br>
+        <button id="authLoginBtn" style="margin-top:10px; background:var(--button-bg); color:#fff; border:none; border-radius:20px; padding:0.5em 1.5em; font-weight:600; cursor:pointer;">Login</button>
+      `;
+      authMessage.style.display = "block";
+      document.getElementById("authLoginBtn").onclick = () => {
+        window.location.href = "/login.html";
+      };
+    }
+
+    function hideAuthMessage() {
+      authMessage.style.display = "none";
+      authMessage.innerHTML = "";
+    }
+
+    // Card click handlers
+    function cardClickHandler(e) {
+      if (!isUserLoggedIn) {
+        e.preventDefault();
+        showAuthMessage();
+      }
+    }
+
+    // Attach handlers
+    iotCard.addEventListener("click", cardClickHandler);
+    cadCard.addEventListener("click", cardClickHandler);
+
+    // Listen to auth state to update isUserLoggedIn and hide message when logged in
+    onAuthStateChanged(auth, user => {
+      isUserLoggedIn = !!(user && !localStorage.getItem("guest"));
+      if (isUserLoggedIn) {
+        hideAuthMessage();
+      }
+    });
+  </script>
+</body>
+</html>

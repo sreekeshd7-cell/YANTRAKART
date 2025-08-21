@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login | Yantrakart Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <style>
+    :root {
+      --bg-color-light: #f5f7fa;
+      --text-color-light: #222;
+      --input-bg-light: #fff;
+      --input-border-light: #ccc;
+      --accent-color-light: #007bff;
+      --error-light: #d9534f;
+      --success-light: #28a745;
+
+      --bg-color-dark: #0d1117;
+      --text-color-dark: #c9d1d9;
+      --input-bg-dark: #161b22;
+      --input-border-dark: #30363d;
+      --accent-color-dark: #00ffe7;
+      --error-dark: #ff4d4d;
+      --success-dark: #4caf50;
+
+      --transition-speed: 0.3s;
+    }
+    html[data-theme='dark'] {
+      --bg-color: var(--bg-color-dark);
+      --text-color: var(--text-color-dark);
+      --input-bg: var(--input-bg-dark);
+      --input-border: var(--input-border-dark);
+      --accent-color: var(--accent-color-dark);
+      --error: var(--error-dark);
+      --success: var(--success-dark);
+      --shadow: 0 0 24px rgba(0, 255, 231, 0.13);
+    }
+    html[data-theme='light'] {
+      --bg-color: var(--bg-color-light);
+      --text-color: var(--text-color-light);
+      --input-bg: var(--input-bg-light);
+      --input-border: var(--input-border-light);
+      --accent-color: var(--accent-color-light);
+      --error: var(--error-light);
+      --success: var(--success-light);
+      --shadow: 0 0 24px rgba(0, 123, 255, 0.15);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      transition: background var(--transition-speed), color var(--transition-speed);
+    }
+    .login-box {
+      background: var(--input-bg);
+      padding: 2.5rem 2rem 2rem 2rem;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      width: 100%;
+      max-width: 400px;
+      margin: 1rem auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      transition: background var(--transition-speed), box-shadow var(--transition-speed);
+      position: relative;
+      overflow: hidden;
+    }
+    .logo {
+      width: 80px;
+      margin: 0 auto 8px auto;
+      display: block;
+      filter: drop-shadow(0 0 12px var(--accent-color));
+      transition: filter var(--transition-speed);
+    }
+    h1 {
+      text-align: center;
+      color: var(--accent-color);
+      letter-spacing: 2px;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 0 10px var(--accent-color);
+      transition: color var(--transition-speed), text-shadow var(--transition-speed);
+      user-select: none;
+    }
+    h2 {
+      text-align: center;
+      color: var(--accent-color);
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+      transition: color var(--transition-speed);
+      user-select: none;
+    }
+    .greeting {
+      text-align: center;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      color: var(--accent-color);
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      user-select: none;
+    }
+    .input-group {
+      position: relative;
+      margin-bottom: 0.75rem;
+      width: 100%;
+    }
+    .input-group input {
+      width: 100%;
+      padding: 0.9rem 3.5rem 0.9rem 2.5rem;
+      border: 1px solid var(--input-border);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text-color);
+      font-size: 1rem;
+      outline: none;
+      transition: border 0.2s, background 0.3s, color 0.3s;
+      word-break: break-word;
+    }
+    .input-group input::placeholder {
+      color: var(--text-color);
+      opacity: 0.6;
+      transition: color 0.3s;
+    }
+    .input-group input:focus {
+      border: 1.5px solid var(--accent-color);
+      background: var(--input-bg);
+    }
+    .input-group .icon {
+      position: absolute;
+      left: 0.9rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--accent-color);
+      font-size: 1.15rem;
+      pointer-events: none;
+      transition: color 0.3s;
+    }
+    .input-group .toggle-password {
+      position: absolute;
+      right: 0.6rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--accent-color);
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      color: var(--bg-color);
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s, color 0.3s;
+      user-select: none;
+      box-shadow: 0 0 8px var(--accent-color);
+    }
+    .input-group .toggle-password:hover,
+    .input-group .toggle-password:focus {
+      background: #00c2ab;
+      color: #fff;
+      outline: none;
+      box-shadow: 0 0 12px #00c2ab;
+    }
+    button {
+      width: 100%;
+      padding: 0.9rem;
+      border: none;
+      border-radius: 6px;
+      background: var(--accent-color);
+      color: var(--bg-color);
+      font-weight: 600;
+      font-size: 1.1rem;
+      cursor: pointer;
+      margin-bottom: 0.5rem;
+      transition: background 0.2s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      user-select: none;
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    button:hover:not(:disabled),
+    .guest-btn:hover {
+      background: #00c2ab;
+    }
+    .guest-btn {
+      background: #575757;
+      color: #fff;
+      margin-top: 0.2rem;
+      font-weight: 500;
+    }
+    .message {
+      text-align: center;
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 0.7rem;
+      min-height: 1.6em;
+      transition: color 0.3s, background 0.3s;
+      word-break: break-word;
+      user-select: none;
+      letter-spacing: 0.5px;
+      background: rgba(0,255,231,0.08);
+      padding: 0.75em 1em;
+      border-radius: 8px;
+    }
+    .error { color: var(--error); }
+    .success { color: var(--success); }
+    .links {
+      text-align: center;
+      margin-top: 0.5rem;
+      font-size: 1rem;
+      user-select: none;
+    }
+    .links a {
+      color: var(--accent-color);
+      font-weight: 600;
+      text-decoration: none;
+      margin: 0 8px;
+      transition: color 0.2s;
+      word-break: break-word;
+    }
+    .links a:hover {
+      color: #fff;
+      text-decoration: underline;
+    }
+    .remember-me {
+      display: flex;
+      align-items: center;
+      font-size: 0.95rem;
+      color: var(--text-color);
+      margin-bottom: 1rem;
+      cursor: pointer;
+      user-select: none;
+      gap: 0.5rem;
+    }
+    .remember-me input[type="checkbox"] {
+      cursor: pointer;
+      width: 18px;
+      height: 18px;
+    }
+    #themeToggle {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: var(--accent-color);
+      font-size: 1.4rem;
+      transition: color 0.3s;
+      outline-offset: 2px;
+      user-select: none;
+    }
+    #themeToggle:hover { color: #00c2ab; }
+    #passwordStrength {
+      height: 8px;
+      border-radius: 6px;
+      background: #ddd;
+      margin-top: -0.6rem;
+      margin-bottom: 0.3rem;
+      overflow: hidden;
+      width: 100%;
+    }
+    #passwordStrength > div {
+      height: 100%;
+      width: 0%;
+      background: var(--error);
+      transition: width 0.3s ease, background 0.3s ease;
+    }
+    #passwordStrengthText {
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-align: right;
+      margin-bottom: 1rem;
+      user-select: none;
+      color: var(--text-color);
+      min-height: 1.2em;
+    }
+    .spinner {
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top: 3px solid var(--bg-color);
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
+    }
+    @media (max-width: 500px) {
+      .login-box {
+        padding: 1.8rem 1rem 1.5rem 1rem;
+        max-width: 100%;
+      }
+      button { font-size: 1rem; }
+    }
+    .help-message {
+      font-size: 0.98rem;
+      color: #888;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .logo-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.2rem;
+  width: 100%;
+}
+
+.brand-title {
+  text-align: center;
+  color: var(--accent-color);
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin: 0.2rem 0 0.2rem 0;
+  text-shadow: 0 0 10px var(--accent-color);
+  font-family: 'Poppins', sans-serif;
+  user-select: none;
+}
+
+.tagline {
+  text-align: center;
+  color: var(--accent-color);
+  font-size: 1.08rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  margin: 0 0 0.5rem 0;
+  font-family: 'Poppins', sans-serif;
+  user-select: none;
+}
+
+html[data-theme='light'] .brand-title,
+html[data-theme='light'] .tagline {
+  color: var(--accent-color-light);
+  text-shadow: none;
+}
+/* --- Mobile Responsive Styles --- */
+@media (max-width: 500px) {
+  .logo-stack {
+    margin-bottom: 0.8rem;
+  }
+  .logo-stack .logo {
+    width: 54px;
+    max-width: 90vw;
+  }
+  .brand-title {
+    font-size: 1.2rem;
+    letter-spacing: 1.2px;
+    margin: 0.13rem 0 0.13rem 0;
+  }
+  .tagline {
+    font-size: 0.97rem;
+    margin-bottom: 0.3rem;
+    letter-spacing: 0.3px;
+    padding: 0 0.2rem;
+  }
+}
+  </style>
+</head>
+<body>
+
+  <div class="logo-stack">
+  <img src="images/logo.jpg" alt="Yantrakart Logo" class="logo" />
+  <div class="brand-title">YANTRAKART</div>
+  <div class="tagline">Smart Projects for Smart Students</div>
+</div>
+
+
+  <div class="login-box" role="main" aria-label="User login form">
+    <button id="themeToggle" aria-label="Toggle light/dark theme" title="Toggle light/dark theme" tabindex="0">
+      <i class="fa-solid fa-moon"></i>
+    </button>
+
+    <h2>User Login</h2>
+    <div class="greeting" id="greeting" aria-live="polite"></div>
+    <div class="message" id="message" role="alert" aria-live="assertive"></div>
+
+    <form id="loginForm" autocomplete="on" onsubmit="return false;">
+      <div class="input-group">
+        <span class="icon"><i class="fa-regular fa-user"></i></span>
+        <input type="text" id="identifier" placeholder="Email or 10-digit Indian Phone" autocomplete="username" required maxlength="50" />
+      </div>
+      <div class="input-group" id="passwordGroup">
+        <span class="icon"><i class="fa-solid fa-lock"></i></span>
+        <input type="password" id="password" placeholder="Password" autocomplete="current-password" required />
+        <button type="button" class="toggle-password" aria-label="Toggle password visibility" title="Toggle password visibility" tabindex="0">
+          <i class="fa-solid fa-eye"></i>
+        </button>
+      </div>
+      <div id="passwordStrength" aria-hidden="true"><div></div></div>
+      <div id="passwordStrengthText" aria-live="polite"></div>
+      <label class="remember-me" for="rememberMe">
+        <input type="checkbox" id="rememberMe" /> Remember Me
+      </label>
+      <button type="submit" id="loginBtn" aria-live="polite">Login</button>
+      <a href="#" onclick="forgotPassword()" style="display:block; text-align:right; font-size:0.93rem;">Forgot Password?</a>
+    </form>
+
+    <div class="help-message">
+      You can log in using your email or your <b>10-digit Indian phone number</b>.
+    </div>
+
+    <div class="divider" style="text-align:center; color:#555; margin:0.5rem 0; user-select:none;">OR</div>
+
+    <button onclick="googleLogin()" style="background:#fff; color:#222; border:1px solid #eee;">
+      <i class="fa-brands fa-google"></i> Sign in with Google
+    </button>
+
+    <button class="guest-btn" onclick="guestLogin()" aria-label="Continue as guest">
+      <i class="fa-solid fa-user-secret"></i> Continue as Guest
+    </button>
+    <!-- Admin Login Button -->
+<button onclick="window.location.href='admin.html'" style="background:#222; color:#00ffe7; border:1px solid #00ffe7; margin-top:0.5rem;">
+  <i class="fa-solid fa-user-shield"></i> Admin Login
+</button>
+
+    <div id="guestMessage" role="alert" aria-live="polite" style="display:none; 
+         background: #00ffe7; 
+         color: #0d1117; 
+         padding: 1rem; 
+         border-radius: 8px; 
+         max-width: 600px; 
+         margin: 1rem auto; 
+         font-weight: 600; 
+         text-align: center; 
+         box-shadow: 0 0 12px #00ffe7;">
+    </div>
+
+    <div class="links">
+      <a href="signup.html">New User? Sign Up</a> |
+      <a href="contact.html">Contact Us</a>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      sendPasswordResetEmail,
+      GoogleAuthProvider,
+      signInWithPopup,
+      sendEmailVerification,
+      setPersistence,
+      browserLocalPersistence,
+      browserSessionPersistence
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    // --- Firebase Config ---
+   const firebaseConfig = {
+  apiKey: "AIzaSyCyjqvnrgCHt3SR4_kD3glRt55ImeXOxxA",
+  authDomain: "yantrakartcu.firebaseapp.com",
+  projectId: "yantrakartcu",
+  storageBucket: "yantrakartcu.firebasestorage.app",
+  messagingSenderId: "958180945232",
+  appId: "1:958180945232:web:18e049c7682da22b239055",
+  measurementId: "G-87FE485DTH"
+};
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // --- Elements ---
+    const message = document.getElementById("message");
+    const greeting = document.getElementById("greeting");
+    const identifier = document.getElementById("identifier");
+    const password = document.getElementById("password");
+    const loginBtn = document.getElementById("loginBtn");
+    const rememberMeCheckbox = document.getElementById("rememberMe");
+    const passwordStrengthBar = document.querySelector("#passwordStrength > div");
+    const passwordStrengthText = document.getElementById("passwordStrengthText");
+    const themeToggleBtn = document.getElementById("themeToggle");
+    const togglePasswordBtn = document.querySelector(".toggle-password");
+
+    function isEmail(str) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str);
+    }
+    function is10DigitIndianPhone(str) {
+      return /^\d{10}$/.test(str);
+    }
+    function toDummyEmail(phone) {
+      return "91" + phone + "@phoneuser.yantrakart";
+    }
+    function showMessage(text, type = "error") {
+      message.innerHTML = text;
+      message.className = `message ${type}`;
+    }
+
+    // --- Password strength meter ---
+    function evaluatePasswordStrength(pwd) {
+      let score = 0;
+      if (!pwd) return 0;
+      if (pwd.length >= 8) score++;
+      if (/[A-Z]/.test(pwd)) score++;
+      if (/[a-z]/.test(pwd)) score++;
+      if (/\d/.test(pwd)) score++;
+      if (/[^A-Za-z0-9]/.test(pwd)) score++;
+      return score;
+    }
+    function getStrengthLabel(score) {
+      switch(score) {
+        case 0: return "";
+        case 1: return "Very Weak";
+        case 2: return "Weak";
+        case 3: return "Medium";
+        case 4: return "Strong";
+        case 5: return "Very Strong";
+        default: return "";
+      }
+    }
+    function updatePasswordStrength(pwd) {
+      const score = evaluatePasswordStrength(pwd);
+      const percent = (score / 5) * 100;
+      passwordStrengthBar.style.width = percent + "%";
+      if (score <= 2) {
+        passwordStrengthBar.style.background = "var(--error)";
+        passwordStrengthText.style.color = "var(--error)";
+      } else if (score === 3 || score === 4) {
+        passwordStrengthBar.style.background = "#f0ad4e";
+        passwordStrengthText.style.color = "#f0ad4e";
+      } else {
+        passwordStrengthBar.style.background = "var(--success)";
+        passwordStrengthText.style.color = "var(--success)";
+      }
+      passwordStrengthText.textContent = getStrengthLabel(score);
+    }
+    password.addEventListener("input", () => {
+      updatePasswordStrength(password.value);
+    });
+
+    // --- Toggle password visibility ---
+    togglePasswordBtn.addEventListener("click", () => {
+      if (password.type === "password") {
+        password.type = "text";
+        togglePasswordBtn.innerHTML = '<i class="fa-solid fa-eye-slash"></i>';
+      } else {
+        password.type = "password";
+        togglePasswordBtn.innerHTML = '<i class="fa-solid fa-eye"></i>';
+      }
+      password.focus();
+    });
+
+    // --- Dynamic greeting ---
+    function updateGreeting() {
+      const now = new Date();
+      const hour = now.getHours();
+      let greet = "Welcome!";
+      if (hour < 12) greet = "Good morning!";
+      else if (hour < 18) greet = "Good afternoon!";
+      else greet = "Good evening!";
+      greeting.textContent = greet;
+    }
+
+    // --- Login handler ---
+    loginBtn.onclick = async (e) => {
+  e.preventDefault();
+  const value = identifier.value.trim();
+  const pwd = password.value.trim();
+  loginBtn.disabled = true;
+  loginBtn.innerHTML = `<span class="spinner" aria-hidden="true"></span> Logging in...`;
+  showMessage("");
+  let emailForLogin;
+  if (isEmail(value)) {
+    emailForLogin = value;
+  } else if (is10DigitIndianPhone(value)) {
+    emailForLogin = toDummyEmail(value);
+  } else {
+    showMessage("Please enter a valid email or 10-digit Indian phone number.", "error");
+    loginBtn.disabled = false;
+    loginBtn.textContent = "Login";
+    return;
+  }
+  try {
+    const rememberMe = rememberMeCheckbox.checked;
+    if (rememberMe) {
+      await setPersistence(auth, browserLocalPersistence);
+    } else {
+      await setPersistence(auth, browserSessionPersistence);
+    }
+    const userCredential = await signInWithEmailAndPassword(auth, emailForLogin, pwd);
+    // Only check email verification for real emails
+    if (isEmail(value) && !userCredential.user.emailVerified) {
+      showMessage("Email not verified. Sending verification email...", "error");
+      await sendEmailVerification(userCredential.user);
+      showMessage("Verification email sent! Please check your inbox.", "success");
+      loginBtn.disabled = false;
+      loginBtn.textContent = "Login";
+      return;
+    }
+    window.location.href = "index.html";
+  } catch (e) {
+    if (e.code === "auth/user-not-found") {
+      showMessage(`This ${isEmail(value) ? "email" : "phone number"} is not registered. <a href="signup.html" style="color:#00c2ab;">Create an account?</a>`, "error");
+    } else {
+      showMessage(e.message, "error");
+    }
+  } finally {
+    loginBtn.disabled = false;
+    loginBtn.textContent = "Login";
+  }
+};
+
+    // --- Forgot password ---
+    window.forgotPassword = async () => {
+      const value = identifier.value.trim();
+      if (!isEmail(value)) {
+        showMessage("Forgot password is only available for email logins. If you registered with phone, <a href='contact.html'>Contact Us</a> for help.", "error");
+        return;
+      }
+      try {
+        await sendPasswordResetEmail(auth, value);
+        showMessage("Password reset email sent!", "success");
+      } catch (error) {
+        showMessage("Could not send password reset email.", "error");
+      }
+    };
+
+    // --- Google login ---
+    window.googleLogin = async () => {
+      const provider = new GoogleAuthProvider();
+      try {
+        await signInWithPopup(auth, provider);
+        window.location.href = "index.html";
+      } catch (error) {
+        showMessage("Google Sign-in failed.", "error");
+      }
+    };
+
+    // --- Guest login ---
+    window.guestLogin = () => {
+      localStorage.setItem("guest", "true");
+      const guestMsg = document.getElementById("guestMessage");
+      if (guestMsg) {
+        guestMsg.textContent = "You are continuing as a guest. Some features may be limited. Please sign up for full access.";
+        guestMsg.style.display = "block";
+      }
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 2000);
+    };
+
+    // --- Theme toggle logic ---
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      if (theme === 'dark') {
+        themeToggleBtn.innerHTML = '<i class="fa-solid fa-moon"></i>';
+        themeToggleBtn.setAttribute('aria-label', 'Switch to light theme');
+        themeToggleBtn.title = 'Switch to light theme';
+      } else {
+        themeToggleBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
+        themeToggleBtn.setAttribute('aria-label', 'Switch to dark theme');
+        themeToggleBtn.title = 'Switch to dark theme';
+      }
+    }
+    function toggleTheme() {
+      const currentTheme = localStorage.getItem('theme') || 'dark';
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('theme', newTheme);
+      applyTheme(newTheme);
+    }
+    themeToggleBtn.addEventListener('click', toggleTheme);
+
+    // --- On page load ---
+    window.onload = () => {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      applyTheme(savedTheme);
+      updateGreeting();
+      identifier.focus();
+    };
+  </script>
+</body>
+</html>
